@@ -34,7 +34,7 @@ sellipse <- function(a, b, k) {
 #' @param return What value to return. Possible values are "area_corr" (Default, returns ratio between measured area and area of ellipse with same horizontal and vertical diameters), "aspect_ratio" (returns aspect ratio), "diameters" (returns diameters) and "area" (returns area). Any other value for this parameter will prompt the function to return a vector containing all of these.
 #' @param k optional superellipse exponent for the (super)ellipse to which the measurements should be compared (for the "area_corr" setting for the parameter return).
 #' @param scale Optional scale of the image (for raw area measurements).
-#' @return A single number, either the ratio between the measured cross-sectional area and that of an ellipse with the same vertical and horizontal diameters, or the measured area (if compare==FALSE).
+#' @return Either a numeric of length 1 (depending on the input of the return parameter), defaulting to the area correction factor (if return=="area_corr"), or (if return is left empty or does not match any of the predefined settings) a numeric vector of length 5 containing all the possible outputs (x and y diameters, aspect ratio, area and area correction factor).
 #' @import jpeg
 #' @import png
 #' @export cscorr
