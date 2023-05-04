@@ -68,9 +68,9 @@ for(x in 1:ncols){
     }else if(method=="less"){
     d <- union(d,which(img[,x,channel]<threshold))
     }else if(method=="not"){
-    d <- union(d,which(img[,x,channel]!=threshold))
+    d <- union(d,which(signif(img[,x,channel],6)!=signif(threshold,6)))
     }else{
-    d <- union(d,which(img[,x,channel]==threshold))
+    d <- union(d,which(signif(img[,x,channel],6)==signif(threshold,6)))
     }
 }
 vdiam <- length(d)/scale #calculate maximum depth in pixels
@@ -84,9 +84,9 @@ for(y in 1:nrows){
     }else if(method=="less"){
     d <- union(d,which(img[y,,channel]<threshold))
     }else if(method=="not"){
-    d <- union(d,which(img[y,,channel]!=threshold))
+    d <- union( d,which( signif(img[y,,channel],6)!=signif(threshold,6)) )
     }else{
-    d <- union(d,which(img[y,,channel]==threshold))
+    d <- union( d,which( signif(img[y,,channel],6)==signif(threshold,6)) )
     }
 }
 hdiam <- length(d)/scale #calculate maximum width in pixels
@@ -101,9 +101,9 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
     }else if(method=="less"){
     area <- sum(img[,,channel]<threshold)
     }else if(method=="not"){
-    area <- sum(img[,,channel]!=threshold)
+    area <- sum( signif(img[,,channel],6)!=signif(threshold,6) )
     }else{
-    area <- sum(img[,,channel]==threshold)
+    area <- sum( signif(img[,,channel],6)==signif(threshold,6) )
     }
   
   # Return the calculated area or ratio
@@ -168,11 +168,11 @@ for (x in 1:ncols) {
       depth <- depth + 1
     }
     }else if(method=="not"){
-    if (color != threshold) {
+    if (signif(color,6) != signif(threshold,6)) {
       depth <- depth + 1
     }
     }else{
-    if (color == threshold) {
+    if (signif(color,6) == signif(threshold,6)) {
       depth <- depth + 1
     }}}
     
@@ -284,7 +284,7 @@ out <- list()
 out$edgetable <- table(edges)
 out$histogram <- hist(edges, breaks=seq(0,1,0.05), plot=FALSE)
 
-out$most_common <- as.numeric(names(which.max(out$edgetable)))
+out$most_common <- signif(as.numeric(names(which.max(out$edgetable))),7)
 
 
 #guess correct setting for method parameter in gdi()
