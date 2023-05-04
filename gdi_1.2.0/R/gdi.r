@@ -30,7 +30,7 @@ sellipse <- function(a, b, k) {
 #' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.
 #' @param threshold Reference value for colour criterium after which pixels that are part of the cross-section are differentiated from the background.
 #' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
-#' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
+#' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
 #' @param return What value to return. Possible values are "area_corr" (Default, returns ratio between measured area and area of ellipse with same horizontal and vertical diameters), "aspect_ratio" (returns aspect ratio), "diameters" (returns diameters) and "area" (returns area). Any other value for this parameter will prompt the function to return a vector containing all of these.
 #' @param k optional superellipse exponent for the (super)ellipse to which the measurements should be compared (for the "area_corr" setting for the parameter return).
 #' @param scale Optional scale of the image (for raw area measurements).
@@ -67,6 +67,8 @@ for(x in 1:ncols){
     d <- union(d,which(img[,x,channel]>threshold))
     }else if(method=="less"){
     d <- union(d,which(img[,x,channel]<threshold))
+    }else if(method=="not"){
+    d <- union(d,which(img[,x,channel]!=threshold))
     }else{
     d <- union(d,which(img[,x,channel]==threshold))
     }
@@ -81,6 +83,8 @@ for(y in 1:nrows){
     d <- union(d,which(img[y,,channel]>threshold))
     }else if(method=="less"){
     d <- union(d,which(img[y,,channel]<threshold))
+    }else if(method=="not"){
+    d <- union(d,which(img[y,,channel]!=threshold))
     }else{
     d <- union(d,which(img[y,,channel]==threshold))
     }
@@ -94,8 +98,10 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
 # calculate actual cross-sectional area
     if(method=="greater"){
     area <- sum(img[,,channel]>threshold)
-    } else if(method=="less"){
+    }else if(method=="less"){
     area <- sum(img[,,channel]<threshold)
+    }else if(method=="not"){
+    area <- sum(img[,,channel]!=threshold)
     }else{
     area <- sum(img[,,channel]==threshold)
     }
@@ -121,7 +127,7 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
 #' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.
 #' @param threshold Reference value for colour criterium after which pixels that are part of the silhouette are differentiated from the background.
 #' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
-#' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
+#' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
 #' @import jpeg
 #' @import png
 #' @export measuresil
@@ -159,6 +165,10 @@ for (x in 1:ncols) {
     }
     }else if(method=="less"){
     if (color < threshold) {
+      depth <- depth + 1
+    }
+    }else if(method=="not"){
+    if (color != threshold) {
       depth <- depth + 1
     }
     }else{
@@ -301,21 +311,27 @@ return(out)
 
 
 ##Function imghist()
-#'Simple histogram plotter for all colour values in an input image. Can be used to help assess whether a chosen threshold value is appropriate.
+#'Simple histogram analysis for all colour values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general.
 #'
 #' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.
 #' @param threshold Reference value for colour criterium after which pixels that are part of the silhouette should be differentiated from the background.
 #' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
+#' @param breaks A vector of breaks for the histogram, defaults to a bin width of 0.05 between colour values of 0 and 1.
+#' @param plot Whether to plot a histogram, defaults to TRUE
+#' @param unique Whether to return counts for unique colour values, defaults to FALSE.
+#' @return A plotted histogram (unless plot==FALSE), and a matrix containing the counts from the histogram (default) or the counts for unique colour values (if unique==TRUE).
 #' @export imghist
 #' @importFrom graphics abline
 #' @importFrom graphics hist
 #' @importFrom graphics rug
+#' @importFrom graphics lines
+#' @importFrom stats density
 #' @examples
 #' fdir <- system.file(package="gdi")
 #' imghist(file.path(fdir,"exdata","lat.png"))
 
 
-imghist <- function(image_file, threshold=0.5, channel=4){
+imghist <- function(image_file, threshold=0.5, channel=4, breaks=seq(0,1,0.05), plot=TRUE, unique=FALSE){
 if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
 img <- jpeg::readJPEG(image_file)}#read image if it is jpg
 
@@ -327,32 +343,31 @@ img<-image_file
 }
 
 
-#show histogram
-hist(img[,,channel], breaks=seq(0,1,0.05), xlab=paste("All pixel colour values in channel", channel))
-rug(img[,,channel], col=add.alpha("black",0.3))
-abline(v=threshold)
+if(plot==TRUE){#show histogram
+hist(img[,,channel], prob=TRUE, breaks=breaks, xlab=paste("All pixel colour values in channel", channel))
+lines(density(img[,,channel]), col="grey", lwd=2)
+abline(v=threshold)}
 
-} 
+total <- length(img[,,channel])
 
-
-##Function add.alpha()
-#'Simple function for adding transparency to colour values, used in plotting by imghist().
-#'
-#' @param col Colour that transparency should be added to.
-#' @param alpha Desired opacity.
-#' @return Colour hex code with transparency, based on the specified input values.
-#' @export add.alpha
-#' @importFrom grDevices col2rgb
-#' @importFrom grDevices rgb
-#' @examples
-#' add.alpha("black",0.5)
-
-add.alpha<-function(col, alpha=0.75){
-  if(missing(col))
-    stop("Please provide a vector of colours.")
-  apply(sapply(col, col2rgb)/255, 2, 
-                     function(x) 
-                       rgb(x[1], x[2], x[3], alpha=alpha))  
+if(unique==FALSE){
+h <- hist(img[,,channel], breaks=breaks, plot=FALSE)
+names<-h$mids
+h <- h$counts
+h <- cbind(h,h/total)
+rownames(h) <- names
+colnames(h) <- c("count","proportion")
+return(h)
 }
 
+if(unique==TRUE){
+counts <- table(img[,,channel])
+sorted <- sort(counts, decreasing=TRUE)
+names <- names(sorted)
+sorted <- cbind(sorted, sorted/total)
+rownames(sorted)<-names
+colnames(sorted) <- c("count","proportion")
+return(sorted)
+}
 
+}
