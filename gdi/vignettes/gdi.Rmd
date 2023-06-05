@@ -18,11 +18,11 @@ knitr::opts_chunk$set(
 library(gdi)
 ```
 
-This vignette demonstrates the basic workflow of the gdi package. We start with a set of image files showing orthogonal views of an animal for which a volumetric estimate is desired.
+This vignette demonstrates the basic workflow of the gdi package for estimating the volume of an extinct animal.
 
-These image files should be aligned and with the long axis horizontal, and complex features that violate the assumption of elliptical or superelliptical cross-sections (e.g. limbs or fins protruding from the silhouette) should be removed and estimated separately.
+We start with a set of image files showing orthogonal views of an animal for which a volumetric estimate is desired. These image files should be aligned and with the long axis horizontal, and complex features that result in a major violation of the assumption of elliptical or superelliptical cross-sections (e.g. limbs or fins that are protruding from the silhouette) should be removed and estimated separately.
 
-These example images are provided with the package in the folder exdata. To import them, execute: 
+Example images are provided with the package in the folder exdata. To import them, execute: 
 ```{r}
 
 fdir <- system.file(package="gdi")
@@ -31,7 +31,7 @@ measurements_lateral <- measuresil(file.path(fdir,"exdata","lat.png"))
 measurements_dorsal <- measuresil(file.path(fdir,"exdata","dors.png"))
 ```
 
-In this case the images are in rgba format and with transparent background. We therefore do not need to change the default options for threshold (0.5), method ("greater") and channel (4) provided with the function. The default selection will automatically count all pixels with an opacity (alpha channel value) of more than 0.5 as part of the silhouette and treat everything else as background.
+In this case the images are saved in rgba format and with transparent background, which is recommended. We therefore do not need to change the default options for threshold (0.5), method ("greater") and channel (4) provided with the function. The default selection will automatically count all pixels with an opacity (alpha channel value) of more than 0.5 as part of the silhouette and treat everything else as background.
 
 Verify that our measurement worked and resulted in two vectors of equal length:
 
@@ -40,7 +40,7 @@ length(measurements_lateral)
 length(measurements_dorsal)
 ```
 
-We can now perform our graphic double integration to estimate the volume:
+We can now **perform our graphic double integration to estimate the volume**:
 
 ```{r}
 gdi(measurements_lateral, measurements_dorsal, scale=100, method="raw")
@@ -56,18 +56,33 @@ gdi(sil, sil, method="raw", scale=1)
 gdi(sil, sil, method="smooth", scale=1)
 
 ```
-
-As we can see, method "raw" gives us the volume of a cylinder with a diameter of 1 and a length (because scale = 1) of 1. On the other hand, method "smooth" (any other string will also work), estimates the volume as a series of frusta, with base areas based on each segment and the one succeeding it. In this case, because segment 1 has a diameter of 0, this results in the estimated volume being that of a cone with length 1 and base diameter 1 and a cylinder for segment two.
+**Details of the gdi() function**
+As we can see, method "raw" gives the volume of a cylinder with a diameter of 1 and a length (because scale = 1) of 1. On the other hand, method "smooth" (any other string will also work), estimates the volume as a series of frusta, with base areas based on each segment and the one succeeding it. In this case, because segment 1 has a diameter of 0, this results in the estimated volume being that of a cone with length 1 and base diameter 1 and a cylinder for segment two.
 
 This difference in methods has very minor effects in analyses using pixel-precise measurements of digital images with reasonable levels of resolutions (in the case of the first example, the difference is only ca. `r signif(gdi(measurements_lateral, measurements_dorsal, scale=100, method="raw")-gdi(measurements_lateral, measurements_dorsal, scale=100, method="smooth"),2)
 ` l), but can have a notable effect at lower resolutions (i.e. with fewer, longer segments, such as occur when performing gdi on manual measurements).
 
+
+**Cross-sectional corrections**
 In the event that cross-sectional geometry of our shape deviates markedly from an ellipse, the package provides two approaches to account for this. The first is the specification of a superellipse exponent as part of the function call to gdi():
 ```{r}
 gdi(measurements_lateral,measurements_dorsal,k=2.3, scale=100)
 ```
 
 In this case we specified an exponent of k=2.3, which results in a cross-sectional area, and thus a volume, approximately `r signif(sellipse(1,1,2.3)/sellipse(1,1,2),3)*100-100`% greater than a standard ellipse. For a review of cross-sectional geometry in vertebrates, see Motani (2001).
+
+The function sellipse.coo() used in conjunction with the standard plotting functions can be used to visualize possible cross-sectional shapes based on their superellipse exponents:
+```{r}
+sellipse.coo(2.0)->ellipse
+plot(ellipse$x,ellipse$y,col="grey", type="l")
+polygon(ellipse$x,ellipse$y,col="grey", border="grey")
+
+sellipse.coo(2.3)->se2.3
+lines(se2.3$x,se2.3$y, col="blue") #plot a superellipse with exponent 2.3
+
+sellipse.coo(3)->se3
+lines(se3$x,se3$y, col="red") #plot a superellipse with exponent 3
+```
 
 The second option is to use a graphical reconstruction of the cross-sectional shape to calculate a correction factor determined from the ratio in areas between the actual cross-section, and an ellipse matching its vertical and horizontal maximum diameters (which correspond to the diameters that would be measured from silhouettes for the GDI).
 Functionality for determining this correction factor from a silhouette image of the cross-section is implemented in the cscorr()-function:
@@ -79,7 +94,7 @@ print(correction_factor)
 
 The resulting correction factor can then be multiplied by the volume estimated by the uncorrected gdi()-results, or directly supplied to the gdi()-function using the 'corr' parameter. 
 
-Both the k and corr parameters can either be a single value applicable to the entire volume, or a numeric vector containing a correction factor for every segment (this vector needs to be of the same length as the diameter measurements used with the gdi()-function, otherwise an error will be returned). If desired, interpolation between different cross-sectional geometries over the length of the model (e.g. using approx()) might be used in order to further increase accuracy of the estimation.
+Both the k and corr parameters can either be a single value applicable to the entire volume, or a numeric vector containing a correction factor for every segment (this vector needs to be of the same length as the diameter measurements used with the gdi()-function, otherwise an error will be returned). If desired, interpolation between different cross-sectional geometries over the length of the model (e.g. using approx()) might be useful in order to further increase accuracy of the estimation.
 
 The volume of more complex shapes can be estimated using this technique, by manually splitting the silhouettes into several pairs of image files, each containing two orthogonal views of each body part. Total volume can then be estimated as the sum of all body parts. Alternatively, if orthogonal views are not available for every body part, simplified assumptions can be made, e.g. based on known height-width ratios.
 For example:
@@ -95,5 +110,4 @@ The cscorr()-function provides a way of estimating an appropriate factor to use 
 aspect_ratio <- cscorr(file.path(fdir,"exdata","cross_section.png"))
 print(aspect_ratio)
 ```
-
 Here the estimated depth/width-ratio is `r signif(aspect_ratio,3)`, so an appropriate width depth ratio would be 1/`r signif(aspect_ratio,3)`=`r signif(1/aspect_ratio,3)`.

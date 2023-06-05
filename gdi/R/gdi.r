@@ -24,6 +24,29 @@ sellipse <- function(a, b, k) {
   return(area)
 }
 
+##Function sellipse.coo()
+#'calculate coordinates for plotting a superellipse for visualizing body cross-sections
+#'
+#' @param k superellipse exponent.
+#' @param res the desired resolution
+#' @return a data frame containing 
+#' @export sellipse.coo
+#' @examples
+#' sellipse.coo(2.0)->df #get coordinates for normal ellipse (exponent k=2)
+#' plot(df$x,df$y,col="black", type="l") #plot normal ellipse
+#' sellipse.coo(2.3)->df2 # get coordinates for superellipse with exponent 2.3
+#' lines(df$x,df$y, col="blue") #plot superellipse
+
+sellipse.coo <- function(k, res=100) {
+  t <- seq(0, 2 * pi, length.out = res)
+  x <- abs(cos(t))^(2 / k) * sign(cos(t))
+  y <- abs(sin(t))^(2 / k) * sign(sin(t))
+  
+  df <- data.frame(x = x, y = y)
+  return(df)
+}
+
+
 ##Function cscorr()
 #'Measure and analyze cross-sectional geometry
 #'

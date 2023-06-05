@@ -1,3 +1,9 @@
+gdi v1.2.2 (Release date: 2023-05-05)
+==============
+
+Changes:
+* added function sellipse.coo() to visualize shapes of superelliptical cross-sections
+
 gdi v1.2.1 (Release date: 2023-05-05)
 ==============
 
