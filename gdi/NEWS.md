@@ -1,4 +1,4 @@
-gdi v1.2.2 (Release date: 2023-05-05)
+gdi v1.2.2 (Release date: 2023-06-07)
 ==============
 
 Changes:
@@ -9,14 +9,13 @@ gdi v1.2.1 (Release date: 2023-05-05)
 
 Changes:
 * added tests using package 'testthat'
-* gdi() now also reports the horizontal length of the silhouette as name of output, helps to spot scaling errors
+* gdi() now also reports the horizontal length of the silhouette as name of output (in the same unit cubed to calculate volume, i.e. decimetres if volume is metres), intended to quickly spot scaling errors
 
 gdi v1.2.0 (Release date: 2023-05-04)
 ==============
 
 Changes:
-* added functions imghist() and fdetect() for aiding with setting appropriate parameters for measuresil() and cscorr()
-* added function add.alpha() for adding transparency to a colour value when plotting.
+* added functions imghist() and fdetect() for aiding with setting appropriate threshold and method parameters for measuresil() and cscorr()
 
 
 gdi v1.1.2 (Release date: 2023-05-04)
@@ -25,7 +24,7 @@ gdi v1.1.2 (Release date: 2023-05-04)
 Changes:
 * Fixed missing "," in description.
 * Fixed errors in and improved vignette.
-* Fixed error in cscorr()-function. Previous version would output the diameters of the silhouette in pixels, even if a scale was provided. New version converts them to units determined by scale.
+* Fixed error in cscorr()-function. Previous version would output the diameters of the silhouette in pixels, even if a scale was provided. New version converts them to units determined by scale parameter.
 
 
 gdi v1.1.1 (Release date: 2023-05-04)
