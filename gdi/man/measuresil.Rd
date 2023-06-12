@@ -4,7 +4,13 @@
 \alias{measuresil}
 \title{Take pixel-by-pixel measurements of a silhouette in jpeg or png format for use with the gdi function.}
 \usage{
-measuresil(image_file, threshold = 0.5, channel = 4, method = "greater")
+measuresil(
+  image_file,
+  threshold = 0.5,
+  channel = 4,
+  method = "greater",
+  align = "h"
+)
 }
 \arguments{
 \item{image_file}{Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.}
@@ -14,6 +20,8 @@ measuresil(image_file, threshold = 0.5, channel = 4, method = "greater")
 \item{channel}{Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).}
 
 \item{method}{Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.}
+
+\item{align}{Indicate whether the silhouette long axis is aligned horizontally (setting "h", default), or vertically (any other parameter setting).}
 }
 \value{
 A numeric vector giving the measurements of the silhouette

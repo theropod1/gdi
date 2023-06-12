@@ -152,6 +152,7 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
 #' @param threshold Reference value for colour criterium after which pixels that are part of the silhouette are differentiated from the background.
 #' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
 #' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
+#' @param align Indicate whether the silhouette long axis is aligned horizontally (setting "h", default), or vertically (any other parameter setting).
 #' @import jpeg
 #' @import png
 #' @export measuresil
@@ -160,7 +161,7 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
 #' fdir <- system.file(package="gdi")
 #' lat <- measuresil(file.path(fdir,"exdata","lat.png"))
 
-measuresil<-function(image_file, threshold=0.5, channel=4, method="greater"){
+measuresil<-function(image_file, threshold=0.5, channel=4, method="greater", align="h"){
 #load and save image data to variable named img
 if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
 img <- jpeg::readJPEG(image_file)}#read image if it is jpg
@@ -172,9 +173,12 @@ if(!is.character(image_file)){
 img<-image_file
 }
 
-# Loop through each vertical line of pixels
+#loop through silhouette and measure diameters
 nrows <- dim(img)[1]
 ncols <- dim(img)[2]
+
+if(align=="h"){#if horizontally aligned, default
+# Loop through each vertical line of pixels
 depths <- rep(0, ncols)
 for (x in 1:ncols) {
   depth <- 0
@@ -202,6 +206,38 @@ for (x in 1:ncols) {
     
   
   depths[x] <- depth
+}
+}else{#if vertically aligned
+# Loop through each horizontal line of pixels
+depths <- rep(0, nrows)
+for (y in 1:nrows) {
+  depth <- 0
+  for (x in 1:ncols) {
+    # Get the color of the selected colour channel of the pixel
+    color <- img[y, x, channel]
+    
+    #increment the depth if colour is greater than threshhold, e.g. transparency
+    if(method=="greater"){
+    if (color > threshold) {
+      depth <- depth + 1
+    }
+    }else if(method=="less"){
+    if (color < threshold) {
+      depth <- depth + 1
+    }
+    }else if(method=="not"){
+    if (signif(color,6) != signif(threshold,6)) {
+      depth <- depth + 1
+    }
+    }else{
+    if (signif(color,6) == signif(threshold,6)) {
+      depth <- depth + 1
+    }}}
+    
+  
+  depths[y] <- depth
+}
+
 }
 
 return(depths)
