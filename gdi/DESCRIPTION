@@ -1,7 +1,7 @@
 Package: gdi
 Title: Volumetric Analysis using Graphic Double Integration
-Version: 1.2.2
-Date: 2023-06-07
+Version: 1.2.3
+Date: 2023-06-12
 Author: Darius Nau [aut, cre]
 Authors@R: 
     person("Darius", "Nau", , "dariusnau@gmx.at", role = c("aut", "cre"),

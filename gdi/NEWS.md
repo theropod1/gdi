@@ -1,3 +1,10 @@
+gdi v1.2.3 (Release date: 2023-06-12)
+==============
+
+Changes:
+* fixed cscorr() area output scaling
+
+
 gdi v1.2.2 (Release date: 2023-06-07)
 ==============
 

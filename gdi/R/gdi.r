@@ -128,6 +128,7 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
     }else{
     area <- sum( signif(img[,,channel],6)==signif(threshold,6) )
     }
+    area<-area/scale^2#set scale for area
   
   # Return the calculated area or ratio
   if(return=="area"){return(area)
@@ -218,7 +219,7 @@ return(depths)
 #' @param k Superellipse exponent to be used for the cross-sectional area. Defaults to 2.0 (normal ellipse).
 #' @param corr Correction factor for area of cross-sections, calculated as the ratio between the actual cross-sectional area and that of a (super)ellipse (depending on the specified exponent k) with the same diameters. This setting enables the function to account for complex, non-elliptical cross-sections. Default value is 1, i.e. no correction. Can be either a single number, or a numeric vector of the same length as lat and dors (in the case of a changing cross-sectional geometry along the length of the body).
 #' @param smooth.ends If method != "raw", specify whether first and last segments should be left raw, or taper to 0 (i.e. be approximated as cones). Only applies if there are no leading or following zeros in the measurement vectors.
-#' @param return Determines whether to report the estimated total volume (if default/"total"), or a data.frame with segment radii, areas and volumes (if left empty of any other character string.
+#' @param return Determines whether to report the estimated total volume (if default/"total"), or a data.frame() with segment radii, areas and volumes (if left empty of any other character string.
 #' @return Either a single number representing the total volume estimated (with names indicating the horizontal length of the silhouette in the unit determined by scale), or (if return!="total") a data.frame() containing columns with the radii in both dimensions, the estimated elliptical or superelliptical areas, and the segment volumes.
 #' @export gdi
 #' @examples

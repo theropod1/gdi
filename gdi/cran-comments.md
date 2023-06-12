@@ -1,3 +1,6 @@
+version 1.2.3:
+>>minor fix
+
 version 1.2.2:
 >>Compared to version 1.1.1, v 1.2.2 supplies some minor fixes and updates and three additional convenience functions that help to automatically determine the correct background colour settings and allow the generation of coordinates for plotting and visually assessing superelliptical body cross-sections of various exponents.
 

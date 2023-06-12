@@ -103,7 +103,7 @@ For example:
 gdi(measurements_lateral, measurements_lateral*0.9, scale=100)
 ```
 
-Here it is assumed that the body width is, on average, 0.9 times the body depth. Such an assumption can be error-prone, but, if used appropriately, and grounded in a solid understanding of the morphology of the taxon under study, might provide reasonable appropriations of body volumes even where no two orthogonal views are available.
+Here it is assumed that the body width is, on average, 0.9 times the body depth. Such an assumption can be error-prone, but, if used appropriately, and grounded in a solid understanding of the morphology of the taxon under study, might provide reasonable approximations of body volumes even where no two orthogonal views are available.
 
 The cscorr()-function provides a way of estimating an appropriate factor to use here when specifying the "aspect_ratio" setting for parameter 'return':
 ```{r}
