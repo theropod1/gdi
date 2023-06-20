@@ -2,14 +2,15 @@ gdi v1.3.0 (Release date: 2023-06-12)
 ==============
 
 Changes:
-* Added parameter setting alignment for measuresil(), allowing the optional use of vertically aligned silhouettes if align!="h"
+* added parameter setting alignment for measuresil(), allowing the optional use of vertically aligned silhouettes if align!="h"
+* updated unit tests to check that scale works correctly
 
 
 gdi v1.2.3 (Release date: 2023-06-12)
 ==============
 
 Changes:
-* fixed cscorr() area output scaling (previous version didn’t set the scale for area)
+* fixed cscorr() area output scaling (previous version didn’t set the scale for area resulting in unscaled area output even when scale is set)
 
 
 gdi v1.2.2 (Release date: 2023-06-07)

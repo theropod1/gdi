@@ -1,4 +1,4 @@
-test_that("gdi() works", {
+test_that("fdetect() works", {
 
 expect_equal(fdetect(system.file("exdata","lat.png", package="gdi"))$most_common, 0)
 
@@ -13,6 +13,16 @@ expect_equal(signif(cscorr(system.file("exdata","cross_section.png", package="gd
 
 #test that area is calculated correctly
 expect_equal(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="area"), 119482)
+
+#test that scale is applied correctly
+expect_equal(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="area", scale=10), 1194.82)
+expect_equal(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="diameters")[1], 313)
+expect_equal(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="diameters", scale=10)[1], 31.3)
+expect_equal(signif(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="diameters", scale=15)[1],4), signif(20.8666667,4))
+expect_equal(signif(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="area_corr", scale=10)[1],4), signif(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="area_corr")[1],4))
+
+
+
   
 })
 
