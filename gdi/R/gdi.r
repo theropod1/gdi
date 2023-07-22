@@ -249,6 +249,7 @@ return(depths)
 #'
 #' @param lat Measurements of diameter in lateral view/first of two orthogonal views to be used with the gdi. Can be either a numeric vector, or a text file to be scanned. Defaults to "lat.txt".
 #' @param dors Measurements of diameter in dorsal view/second of two orthogonal views to be used with the gdi. Can be either a numeric vector, or a text file to be scanned. Must be the same length as lat. Defaults to "dors.txt".
+#' @param indices Optional indices specifying a subset of the silhouette measurement vectors to be analyzed. Useful if separate segment calculations are desired.
 #' @param scale Scale of the data in terms of how many units of the input data are in one side of the desired unit of output volume. Defaults to 10.
 #' @param sliceL Length of individual segments to be used in the GDI. Defaults to 1/scale.
 #' @param method Method to be used for the GDI. Default "raw" setting calculates each segment as an elliptical cylinder with volume = Area * SliceL. Any other string will result in volume being calculated as an elliptical frustum with base areas based on the measurements of segments i and i+1.
@@ -265,13 +266,15 @@ return(depths)
 #' gdi(lat=lateral, dors=lateral/2, scale=10, method="smooth", k=2.3)
 
 
-gdi<-function(lat, dors, scale=10, sliceL=1/scale, method="raw", k=2.0, corr=1, smooth.ends=FALSE, return="total"){
+gdi<-function(lat, dors, indices=c(1:length(lat)), scale=10, sliceL=1/scale, method="raw", k=2.0, corr=1, smooth.ends=FALSE, return="total"){
 
 if(is.character(lat)){scan(lat)->lat}
 
 if(is.character(dors)){scan(dors)->dors}
 
 sil<-data.frame(lat/scale,dors/scale)#scale-adjust and save in dataframe
+
+sil<-sil[indices,]
 
 #estimate cross-sections as (super)ellipses
 sil$A<-sellipse(sil$lat/2, sil$dors/2, k)

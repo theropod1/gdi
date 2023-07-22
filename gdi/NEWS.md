@@ -1,3 +1,10 @@
+gdi v1.3.1 (Release date: 2023-07-22)
+==============
+
+Changes:
+* added parameter setting indices for gdi(), allowing to specify optional indices to specify a subset of the measurement vectors
+
+
 gdi v1.3.0 (Release date: 2023-06-12)
 ==============
 

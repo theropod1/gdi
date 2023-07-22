@@ -16,10 +16,11 @@ expect_equal(cscorr(system.file("exdata","cross_section.png", package="gdi"), re
 
 #test that scale is applied correctly
 expect_equal(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="area", scale=10), 1194.82)
-expect_equal(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="diameters")[1], 313)
-expect_equal(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="diameters", scale=10)[1], 31.3)
-expect_equal(signif(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="diameters", scale=15)[1],4), signif(20.8666667,4))
-expect_equal(signif(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="area_corr", scale=10)[1],4), signif(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="area_corr")[1],4))
+expect_equal(as.numeric(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="diameters")[1]), 313)
+expect_equal(as.numeric(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="diameters", scale=10)[1]), 31.3)
+expect_equal(as.numeric(signif(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="diameters", scale=15)[1],4)), signif(20.8666667,4))
+
+expect_equal(as.numeric(signif(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="all", scale=10)[5],4)), as.numeric(signif(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="area_corr")[1],4)))
 
 
 

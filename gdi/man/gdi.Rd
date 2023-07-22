@@ -7,6 +7,7 @@
 gdi(
   lat,
   dors,
+  indices = c(1:length(lat)),
   scale = 10,
   sliceL = 1/scale,
   method = "raw",
@@ -20,6 +21,8 @@ gdi(
 \item{lat}{Measurements of diameter in lateral view/first of two orthogonal views to be used with the gdi. Can be either a numeric vector, or a text file to be scanned. Defaults to "lat.txt".}
 
 \item{dors}{Measurements of diameter in dorsal view/second of two orthogonal views to be used with the gdi. Can be either a numeric vector, or a text file to be scanned. Must be the same length as lat. Defaults to "dors.txt".}
+
+\item{indices}{Optional indices specifying a subset of the silhouette measurement vectors to be analyzed. Useful if separate segment calculations are desired.}
 
 \item{scale}{Scale of the data in terms of how many units of the input data are in one side of the desired unit of output volume. Defaults to 10.}
 
