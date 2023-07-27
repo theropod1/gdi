@@ -16,7 +16,7 @@
 \item{...}{Other parameters to pass on to plot() or lines()}
 }
 \value{
-A plotted silhuette
+A plotted silhouette
 }
 \description{
 Plots a silhouette read by measuresil()

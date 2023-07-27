@@ -597,8 +597,10 @@ return(weighted.mean(y_center, w=masses, na.rm=TRUE)/scale)
 #' @param flip Whether to flip axes (useful if measuresil() was performed using align="v", defaults to FALSE.
 #' @param add Whether to add to an existing plot
 #' @param ... Other parameters to pass on to plot() or lines()
-#' @return A plotted silhuette
+#' @return A plotted silhouette
 #' @export plot.sil
+#' @importFrom graphics lines
+#' @importFrom graphics plot.default
 #' @examples
 #' fdir <- system.file(package="gdi")
 #' measuresil(file.path(fdir,"exdata","lat.png"), return="all")->lat_

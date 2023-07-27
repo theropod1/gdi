@@ -40,7 +40,7 @@ gdi v1.2.1 (Release date: 2023-05-05)
 
 Changes:
 * added tests using package 'testthat'
-* gdi() now also reports the horizontal length of the silhouette as name of output (in the same unit cubed to calculate volume, i.e. decimetres if volume is metres), intended to quickly spot scaling errors
+* gdi() now also reports the horizontal length of the silhouette as name of output (in the same unit cubed to calculate volume, i.e. decimeters if volume is metres), intended to quickly spot scaling errors
 
 gdi v1.2.0 (Release date: 2023-05-04)
 ==============
