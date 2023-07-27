@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Estimating Centre of Mass</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Estimating Centre of Mass</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(gdi)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co">#&gt; Loading required package: jpeg</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co">#&gt; Loading required package: png</span></span></code></pre></div>
+<p><strong>Basic Workflow for COM Estimation</strong></p>
+<p>This vignette demonstrates use of the gdi package for estimating the position of the center of mass (COM) of an animal body.</p>
+<p>As with volume estimation, the process starts with aligned silhouette images representing at least two views, which we measure and then perform gdi() on (for details, see vignette: gdi).</p>
+<p>For this example, we will import the sample images provided with the package:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>fdir &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="dt">package=</span><span class="st">&quot;gdi&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>measurements_lateral &lt;-<span class="st"> </span><span class="kw">measuresil</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;lat.png&quot;</span>), <span class="dt">return=</span><span class="st">&quot;all&quot;</span>) <span class="co"># using the &quot;return&quot; parameter, we can make measuresil output a data.frame containing the centers on the y axis</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>measurements_dorsal &lt;-<span class="st"> </span><span class="kw">measuresil</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;dors.png&quot;</span>)) <span class="co">#because our organism is bilaterally symmetric, we are not interested in the location of the COM on the transverse axis, and can therefore disregard recording centers for the dorsal view</span></span></code></pre></div>
+<p>We now have a data.frame containing the respective y centers and the diameters, which should look like this:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a>knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">head</span>(measurements_lateral, <span class="dv">10</span>))</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">diameter</th>
+<th align="right">center</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0</td>
+<td align="right">NaN</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="right">NaN</td>
+</tr>
+<tr class="odd">
+<td align="right">0</td>
+<td align="right">NaN</td>
+</tr>
+<tr class="even">
+<td align="right">11</td>
+<td align="right">809.0</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="right">809.0</td>
+</tr>
+<tr class="even">
+<td align="right">21</td>
+<td align="right">809.0</td>
+</tr>
+<tr class="odd">
+<td align="right">26</td>
+<td align="right">809.5</td>
+</tr>
+<tr class="even">
+<td align="right">30</td>
+<td align="right">809.5</td>
+</tr>
+<tr class="odd">
+<td align="right">32</td>
+<td align="right">809.5</td>
+</tr>
+<tr class="even">
+<td align="right">36</td>
+<td align="right">809.5</td>
+</tr>
+</tbody>
+</table>
+<p>To perform a graphic double integration to get the volumes, simply do:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">gdi</span>(measurements_lateral, measurements_dorsal, <span class="dt">scale=</span><span class="dv">100</span>, <span class="dt">return=</span><span class="st">&quot;all&quot;</span>)-&gt;gdiresults <span class="co"># the parameter setting for &quot;return&quot; makes gdi() return a data.frame with all individual segment volumes, rather than only a single volume for the entire shape</span></span></code></pre></div>
+<p>We now have a data.frame containing the respective segment volumes and y-axis centers, rather than the single numeric containing the total volume for the same shape (40 l). Our resulting data.frame should look like this:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">head</span>(gdiresults))</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">ydiam_raw</th>
+<th align="right">zdiam_raw</th>
+<th align="right">ydiam_scaled</th>
+<th align="right">zdiam_scaled</th>
+<th align="right">slice_length</th>
+<th align="right">y_center</th>
+<th align="right">A</th>
+<th align="right">V</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.01</td>
+<td align="right">NaN</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.01</td>
+<td align="right">NaN</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="odd">
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="right">0.00</td>
+<td align="right">0.00</td>
+<td align="right">0.01</td>
+<td align="right">NaN</td>
+<td align="right">0.0000000</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="right">11</td>
+<td align="right">8</td>
+<td align="right">0.11</td>
+<td align="right">0.08</td>
+<td align="right">0.01</td>
+<td align="right">809</td>
+<td align="right">0.0069115</td>
+<td align="right">0.0000691</td>
+</tr>
+<tr class="odd">
+<td align="right">17</td>
+<td align="right">12</td>
+<td align="right">0.17</td>
+<td align="right">0.12</td>
+<td align="right">0.01</td>
+<td align="right">809</td>
+<td align="right">0.0160221</td>
+<td align="right">0.0001602</td>
+</tr>
+<tr class="even">
+<td align="right">21</td>
+<td align="right">15</td>
+<td align="right">0.21</td>
+<td align="right">0.15</td>
+<td align="right">0.01</td>
+<td align="right">809</td>
+<td align="right">0.0247400</td>
+<td align="right">0.0002474</td>
+</tr>
+</tbody>
+</table>
+<p>We can now pass this data.frame on to the functions hCOM() and vCOM(), for estimating the horizontal and vertical COM position, calculated from the x and y coordinates for the segments, weighted by their respective volumes:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">hCOM</span>(gdiresults)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">#&gt; [1] 1005.173</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="kw">vCOM</span>(gdiresults)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true"></a><span class="co">#&gt; [1] 795.6165</span></span></code></pre></div>
+<p>For now, these methods only work for the “raw” method of gdi(), i.e. treating each segment as an elliptical prism. They can, however, also be used with manually supplied vectors with segment COM positions, if desired. We will cover the automatic way, using the outputs of gdi() and measuresil() here, and assume a silhouette with sufficient resolution to make simple prismatic approximation accurate.</p>
+<p>So the coordinates, in pixels, of the estimated center of mass of the shape are approximately 1005 horizontally, and 796 vertically.</p>
+<p>We can visualize the results using the function plot.sil():</p>
+<div class="figure">
+<img src="data:image/png;base64,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" alt />
+<p class="caption">Plotted silhouette, with horizontal and vertical COM position marked.</p>
+</div>
+<p>In addition, the functions have options for supplying a vector of volumes to be subtracted (e.g. internal airspaces, parameter “subtract”) or of segment densities (parameter “densities”) to use in calculation of COM position.</p>
+<p><strong>More Complex Shapes</strong></p>
+<p>As with volume estimation, protruding elements, such as limbs, are best estimated separately and then combined as a final step.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a>hindlimb_lateral &lt;-<span class="st"> </span><span class="kw">measuresil</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;hl.png&quot;</span>),<span class="dt">align=</span><span class="st">&quot;v&quot;</span>, <span class="dt">return=</span><span class="st">&quot;all&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a>forelimb_lateral &lt;-<span class="st"> </span><span class="kw">measuresil</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;fl.png&quot;</span>), <span class="dt">align=</span><span class="st">&quot;v&quot;</span>, <span class="dt">return=</span><span class="st">&quot;all&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true"></a>hl&lt;-<span class="kw">gdi</span>(hindlimb_lateral,<span class="fl">0.7</span><span class="op">*</span>hindlimb_lateral,<span class="dt">scale=</span><span class="dv">100</span>, <span class="dt">return=</span><span class="st">&quot;all&quot;</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true"></a>fl&lt;-<span class="kw">gdi</span>(forelimb_lateral, <span class="fl">0.7</span><span class="op">*</span>forelimb_lateral, <span class="dt">scale=</span><span class="dv">100</span>, <span class="dt">return=</span><span class="st">&quot;all&quot;</span>)</span></code></pre></div>
+<p>Here we need to keep in mind that the orientation of the different elements is not the same. Since we are measuring the silhouettes of the limbs as vertically aligned, we have to use vCOM() instead of hCOM() and hCOM() instead of vCOM(). Moreover, care needs to be taken with pixel coordinates, as these are measured from top down in an image, but from bottom up in plots.</p>
+<p>Hence, it is recommended to use the built-in plotting function to verify plausibility of results:</p>
+<pre><code>#&gt; [1] &quot;converted from top-down measurement&quot;</code></pre>
+<div class="figure">
+<img src="data:image/png;base64,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" alt />
+<p class="caption">Plotted silhouette, including limbs and individual segment COM positions</p>
+</div>
+<pre><code>#&gt; [1] &quot;converted from top-down measurement&quot;</code></pre>
+<p>As we can see, our COM positions seem to be correctly aligned. As you can see we additionally specify align=“v” with hCOM for the limb segments, because the horizontal values of the vertically aligned silhouette are measured from the top down. If we want to know the overall COM position, we can now simply take a weighted mean of all the segments. For this we need segment volumes as a weighting factor, which we can easily calculate:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">gdi</span>(hindlimb_lateral,<span class="fl">0.7</span><span class="op">*</span>hindlimb_lateral,<span class="dt">scale=</span><span class="dv">100</span>)-&gt;hindlimbV</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="kw">gdi</span>(forelimb_lateral, <span class="fl">0.7</span><span class="op">*</span>forelimb_lateral, <span class="dt">scale=</span><span class="dv">100</span>)-&gt;forelimbV</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="kw">gdi</span>(measurements_lateral, measurements_dorsal, <span class="dt">scale=</span><span class="dv">100</span>, <span class="dt">method=</span><span class="st">&quot;raw&quot;</span>)-&gt;axialV</span></code></pre></div>
+<p>We can now create a table of individual segment volumes and COM positions:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>volumes&lt;-<span class="kw">c</span>(axialV, forelimbV, hindlimbV)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>x_COM&lt;-<span class="kw">c</span>(<span class="kw">hCOM</span>(gdiresults), <span class="kw">vCOM</span>(fl), <span class="kw">vCOM</span>(hl))</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a>y_COM&lt;-<span class="kw">c</span>(<span class="kw">vCOM</span>(gdiresults), <span class="kw">hCOM</span>(fl, <span class="dt">align=</span><span class="st">&quot;v&quot;</span>), <span class="kw">hCOM</span>(hl,<span class="dt">align=</span><span class="st">&quot;v&quot;</span>))</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;converted from top-down measurement&quot;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a><span class="co">#&gt; [1] &quot;converted from top-down measurement&quot;</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true"></a>knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">data.frame</span>(volumes,x_COM,y_COM, <span class="dt">row.names=</span><span class="kw">c</span>(<span class="st">&quot;axial_total&quot;</span>,<span class="st">&quot;forelimb&quot;</span>,<span class="st">&quot;hindlimb&quot;</span>)))</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">volumes</th>
+<th align="right">x_COM</th>
+<th align="right">y_COM</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">axial_total</td>
+<td align="right">40.2567743</td>
+<td align="right">1005.1733</td>
+<td align="right">795.6165</td>
+</tr>
+<tr class="even">
+<td align="left">forelimb</td>
+<td align="right">0.3791994</td>
+<td align="right">648.5819</td>
+<td align="right">581.6615</td>
+</tr>
+<tr class="odd">
+<td align="left">hindlimb</td>
+<td align="right">0.7045106</td>
+<td align="right">1058.6803</td>
+<td align="right">522.9656</td>
+</tr>
+</tbody>
+</table>
+<p>Finally, overall COM is calculated as the weighted mean of all segment values:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="kw">weighted.mean</span>(x_COM,<span class="dt">w=</span>volumes<span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">2</span>))<span class="co">#horizontal COM position</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="co">#&gt; [1] 1000.576</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="kw">weighted.mean</span>(y_COM,<span class="dt">w=</span>volumes<span class="op">*</span><span class="kw">c</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">2</span>))<span class="co">#vertical COM position</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a><span class="co">#&gt; [1] 782.7362</span></span></code></pre></div>
+<div class="figure">
+<img src="data:image/png;base64,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" alt />
+<p class="caption">Plotted silhouette with overall COM position highlighted</p>
+</div>
+<p>It should be noted that precision with vertical COM position estimation is limited compared to the horizontal position, as differences in density can be taken into account to the nearest pixel for the latter, while for the former the centroid of each (elliptical or superelliptical) cross-section is calculated, irrespective of heterogeneous densities or differences in internal composition throughout the structure.</p>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

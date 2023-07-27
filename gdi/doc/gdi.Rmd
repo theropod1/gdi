@@ -17,14 +17,14 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(gdi)
 ```
+**Basic Workflow for Volume Estimation**
 
-This vignette demonstrates the basic workflow of the gdi package for estimating the volume of an extinct animal.
+This vignette demonstrates the basic workflow of the gdi package for estimating the volume of an (extinct) animal based on multiview photos or reconstructions.
 
 We start with a set of image files showing orthogonal views of an animal for which a volumetric estimate is desired. These image files should be aligned and with the long axis horizontal, and complex features that result in a major violation of the assumption of elliptical or superelliptical cross-sections (e.g. limbs or fins that are protruding from the silhouette) should be removed and estimated separately.
 
 Example images are provided with the package in the folder exdata. To import them, execute: 
 ```{r}
-
 fdir <- system.file(package="gdi")
 
 measurements_lateral <- measuresil(file.path(fdir,"exdata","lat.png"))
@@ -103,7 +103,7 @@ For example:
 gdi(measurements_lateral, measurements_lateral*0.9, scale=100)
 ```
 
-Here it is assumed that the body width is, on average, 0.9 times the body depth. Such an assumption can be error-prone, but, if used appropriately, and grounded in a solid understanding of the morphology of the taxon under study, might provide reasonable appropriations of body volumes even where no two orthogonal views are available.
+Here it is assumed that the body width is, on average, 0.9 times the body depth. Such an assumption can be error-prone, but, if used appropriately, and grounded in a solid understanding of the morphology of the taxon under study, might provide reasonable approximations of body volumes even where no two orthogonal views are available.
 
 The cscorr()-function provides a way of estimating an appropriate factor to use here when specifying the "aspect_ratio" setting for parameter 'return':
 ```{r}
@@ -111,3 +111,26 @@ aspect_ratio <- cscorr(file.path(fdir,"exdata","cross_section.png"))
 print(aspect_ratio)
 ```
 Here the estimated depth/width-ratio is `r signif(aspect_ratio,3)`, so an appropriate width depth ratio would be 1/`r signif(aspect_ratio,3)`=`r signif(1/aspect_ratio,3)`.
+
+**Complex Shapes**
+
+Complex protruding structures that violate the assumption of roughly elliptical cross-sections are best estimated separately. Notably this includes limbs.
+```{r}
+hindlimb_lateral <- measuresil(file.path(fdir,"exdata","hl.png"),align="v")
+forelimb_lateral <- measuresil(file.path(fdir,"exdata","fl.png"), align="v")
+```
+
+By setting the parameter "align" to "v", we can specify that the silhouettes in question are aligned vertically, i.e. that the elliptical slices should be taken horizontally. In this case, we only have lateral views of the limbs, so we will make a simplified assumption of the transverse diameters being approximately 0.7 times the anteroposterior diameters.
+
+```{r}
+gdi(hindlimb_lateral,0.7*hindlimb_lateral,scale=100)->hindlimb
+gdi(forelimb_lateral, 0.7*forelimb_lateral, scale=100)->forelimb
+gdi(measurements_lateral, measurements_dorsal, scale=100, method="raw")->axial_total
+knitr::kable(data.frame(axial_total, forelimb, hindlimb))
+```
+
+To get the total body volume, we can now simply sum up our volume (taking care to multiply paired structures by two):
+
+```{r}
+axial_total+2*forelimb+2*hindlimb
+```

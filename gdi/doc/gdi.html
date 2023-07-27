@@ -356,17 +356,15 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(gdi)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a><span class="co">#&gt; Loading required package: jpeg</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a><span class="co">#&gt; Loading required package: png</span></span></code></pre></div>
-<p>This vignette demonstrates the basic workflow of the gdi package for estimating the volume of an extinct animal.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(gdi)</span></code></pre></div>
+<p><strong>Basic Workflow for Volume Estimation</strong></p>
+<p>This vignette demonstrates the basic workflow of the gdi package for estimating the volume of an (extinct) animal based on multiview photos or reconstructions.</p>
 <p>We start with a set of image files showing orthogonal views of an animal for which a volumetric estimate is desired. These image files should be aligned and with the long axis horizontal, and complex features that result in a major violation of the assumption of elliptical or superelliptical cross-sections (e.g. limbs or fins that are protruding from the silhouette) should be removed and estimated separately.</p>
 <p>Example images are provided with the package in the folder exdata. To import them, execute:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a>fdir &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="dt">package=</span><span class="st">&quot;gdi&quot;</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>measurements_lateral &lt;-<span class="st"> </span><span class="kw">measuresil</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;lat.png&quot;</span>))</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true"></a>measurements_dorsal &lt;-<span class="st"> </span><span class="kw">measuresil</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;dors.png&quot;</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>fdir &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="dt">package=</span><span class="st">&quot;gdi&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a>measurements_lateral &lt;-<span class="st"> </span><span class="kw">measuresil</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;lat.png&quot;</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true"></a>measurements_dorsal &lt;-<span class="st"> </span><span class="kw">measuresil</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;dors.png&quot;</span>))</span></code></pre></div>
 <p>In this case the images are saved in rgba format and with transparent background, which is recommended. We therefore do not need to change the default options for threshold (0.5), method (“greater”) and channel (4) provided with the function. The default selection will automatically count all pixels with an opacity (alpha channel value) of more than 0.5 as part of the silhouette and treat everything else as background.</p>
 <p>Verify that our measurement worked and resulted in two vectors of equal length:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true"></a><span class="kw">length</span>(measurements_lateral)</span>
@@ -375,12 +373,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true"></a><span class="co">#&gt; [1] 2341</span></span></code></pre></div>
 <p>We can now <strong>perform our graphic double integration to estimate the volume</strong>:</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">gdi</span>(measurements_lateral, measurements_dorsal, <span class="dt">scale=</span><span class="dv">100</span>, <span class="dt">method=</span><span class="st">&quot;raw&quot;</span>)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">#&gt; x_dim_23.34_units </span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co">#&gt;          42.35055</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a><span class="co">#&gt; x_dim_23.35_units </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="co">#&gt;          40.25677</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a><span class="kw">gdi</span>(measurements_lateral, measurements_dorsal, <span class="dt">scale=</span><span class="dv">100</span>, <span class="dt">method=</span><span class="st">&quot;smooth&quot;</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="co">#&gt; x_dim_23.34_units </span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co">#&gt;          42.35045</span></span></code></pre></div>
-<p>The result of this function is the estimated volume in the chosen unit of measurements. The silhouette is at a scale of 100px:10cm, so a scale value of 100 will report the volume in litres (cubic decimetres), namely 42.3504522 for this example. The principal difference between “raw” and “smooth” for the parameter “method” is that “raw” approximates the body as a stack of elliptical cylinders (“classic” gdi), whereas “smooth” approximates it as a sequence of elliptical frusta (with base areas based on the diameters of segments i and i+1).</p>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a><span class="co">#&gt; x_dim_23.35_units </span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co">#&gt;          40.25668</span></span></code></pre></div>
+<p>The result of this function is the estimated volume in the chosen unit of measurements. The silhouette is at a scale of 100px:10cm, so a scale value of 100 will report the volume in litres (cubic decimetres), namely 40.2566754 for this example. The principal difference between “raw” and “smooth” for the parameter “method” is that “raw” approximates the body as a stack of elliptical cylinders (“classic” gdi), whereas “smooth” approximates it as a sequence of elliptical frusta (with base areas based on the diameters of segments i and i+1).</p>
 <p>To illustrate the difference, consider the following example:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a>sil &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="dv">0</span>,<span class="dv">1</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="kw">gdi</span>(sil, sil, <span class="dt">method=</span><span class="st">&quot;raw&quot;</span>, <span class="dt">scale=</span><span class="dv">1</span>)</span>
@@ -390,11 +388,11 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true"></a><span class="co">#&gt; x_dim_1_units </span></span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true"></a><span class="co">#&gt;      1.047198</span></span></code></pre></div>
 <p><strong>Details of the gdi() function</strong> As we can see, method “raw” gives the volume of a cylinder with a diameter of 1 and a length (because scale = 1) of 1. On the other hand, method “smooth” (any other string will also work), estimates the volume as a series of frusta, with base areas based on each segment and the one succeeding it. In this case, because segment 1 has a diameter of 0, this results in the estimated volume being that of a cone with length 1 and base diameter 1 and a cylinder for segment two.</p>
-<p>This difference in methods has very minor effects in analyses using pixel-precise measurements of digital images with reasonable levels of resolutions (in the case of the first example, the difference is only ca. 10^{-4} l), but can have a notable effect at lower resolutions (i.e. with fewer, longer segments, such as occur when performing gdi on manual measurements).</p>
+<p>This difference in methods has very minor effects in analyses using pixel-precise measurements of digital images with reasonable levels of resolutions (in the case of the first example, the difference is only ca. 9.9^{-5} l), but can have a notable effect at lower resolutions (i.e. with fewer, longer segments, such as occur when performing gdi on manual measurements).</p>
 <p><strong>Cross-sectional corrections</strong> In the event that cross-sectional geometry of our shape deviates markedly from an ellipse, the package provides two approaches to account for this. The first is the specification of a superellipse exponent as part of the function call to gdi():</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">gdi</span>(measurements_lateral,measurements_dorsal,<span class="dt">k=</span><span class="fl">2.3</span>, <span class="dt">scale=</span><span class="dv">100</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">#&gt; x_dim_23.34_units </span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co">#&gt;          44.46848</span></span></code></pre></div>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">#&gt; x_dim_23.35_units </span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co">#&gt;          42.26999</span></span></code></pre></div>
 <p>In this case we specified an exponent of k=2.3, which results in a cross-sectional area, and thus a volume, approximately 5% greater than a standard ellipse. For a review of cross-sectional geometry in vertebrates, see Motani (2001).</p>
 <p>The function sellipse.coo() used in conjunction with the standard plotting functions can be used to visualize possible cross-sectional shapes based on their superellipse exponents:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">sellipse.coo</span>(<span class="fl">2.0</span>)-&gt;ellipse</span>
@@ -416,14 +414,45 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <p>Both the k and corr parameters can either be a single value applicable to the entire volume, or a numeric vector containing a correction factor for every segment (this vector needs to be of the same length as the diameter measurements used with the gdi()-function, otherwise an error will be returned). If desired, interpolation between different cross-sectional geometries over the length of the model (e.g. using approx()) might be useful in order to further increase accuracy of the estimation.</p>
 <p>The volume of more complex shapes can be estimated using this technique, by manually splitting the silhouettes into several pairs of image files, each containing two orthogonal views of each body part. Total volume can then be estimated as the sum of all body parts. Alternatively, if orthogonal views are not available for every body part, simplified assumptions can be made, e.g. based on known height-width ratios. For example:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">gdi</span>(measurements_lateral, measurements_lateral<span class="op">*</span><span class="fl">0.9</span>, <span class="dt">scale=</span><span class="dv">100</span>)</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="co">#&gt; x_dim_23.34_units </span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="co">#&gt;          43.48642</span></span></code></pre></div>
-<p>Here it is assumed that the body width is, on average, 0.9 times the body depth. Such an assumption can be error-prone, but, if used appropriately, and grounded in a solid understanding of the morphology of the taxon under study, might provide reasonable appropriations of body volumes even where no two orthogonal views are available.</p>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="co">#&gt; x_dim_23.35_units </span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="co">#&gt;          43.85454</span></span></code></pre></div>
+<p>Here it is assumed that the body width is, on average, 0.9 times the body depth. Such an assumption can be error-prone, but, if used appropriately, and grounded in a solid understanding of the morphology of the taxon under study, might provide reasonable approximations of body volumes even where no two orthogonal views are available.</p>
 <p>The cscorr()-function provides a way of estimating an appropriate factor to use here when specifying the “aspect_ratio” setting for parameter ‘return’:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a>aspect_ratio &lt;-<span class="st"> </span><span class="kw">cscorr</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;cross_section.png&quot;</span>))</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a><span class="kw">print</span>(aspect_ratio)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="co">#&gt; [1] 1.092215</span></span></code></pre></div>
 <p>Here the estimated depth/width-ratio is 1.09, so an appropriate width depth ratio would be 1/1.09=0.916.</p>
+<p><strong>Complex Shapes</strong></p>
+<p>Complex protruding structures that violate the assumption of roughly elliptical cross-sections are best estimated separately. Notably this includes limbs.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a>hindlimb_lateral &lt;-<span class="st"> </span><span class="kw">measuresil</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;hl.png&quot;</span>),<span class="dt">align=</span><span class="st">&quot;v&quot;</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a>forelimb_lateral &lt;-<span class="st"> </span><span class="kw">measuresil</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;fl.png&quot;</span>), <span class="dt">align=</span><span class="st">&quot;v&quot;</span>)</span></code></pre></div>
+<p>By setting the parameter “align” to “v”, we can specify that the silhouettes in question are aligned vertically, i.e. that the elliptical slices should be taken horizontally. In this case, we only have lateral views of the limbs, so we will make a simplified assumption of the transverse diameters being approximately 0.7 times the anteroposterior diameters.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true"></a><span class="kw">gdi</span>(hindlimb_lateral,<span class="fl">0.7</span><span class="op">*</span>hindlimb_lateral,<span class="dt">scale=</span><span class="dv">100</span>)-&gt;hindlimb</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true"></a><span class="kw">gdi</span>(forelimb_lateral, <span class="fl">0.7</span><span class="op">*</span>forelimb_lateral, <span class="dt">scale=</span><span class="dv">100</span>)-&gt;forelimb</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true"></a><span class="kw">gdi</span>(measurements_lateral, measurements_dorsal, <span class="dt">scale=</span><span class="dv">100</span>, <span class="dt">method=</span><span class="st">&quot;raw&quot;</span>)-&gt;axial_total</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true"></a>knitr<span class="op">::</span><span class="kw">kable</span>(<span class="kw">data.frame</span>(axial_total, forelimb, hindlimb))</span></code></pre></div>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="right">axial_total</th>
+<th align="right">forelimb</th>
+<th align="right">hindlimb</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">x_dim_23.35_units</td>
+<td align="right">40.25677</td>
+<td align="right">0.3791994</td>
+<td align="right">0.7045106</td>
+</tr>
+</tbody>
+</table>
+<p>To get the total body volume, we can now simply sum up our volume (taking care to multiply paired structures by two):</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true"></a>axial_total<span class="op">+</span><span class="dv">2</span><span class="op">*</span>forelimb<span class="op">+</span><span class="dv">2</span><span class="op">*</span>hindlimb</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true"></a><span class="co">#&gt; x_dim_23.35_units </span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true"></a><span class="co">#&gt;          42.42419</span></span></code></pre></div>
 
 
 

@@ -8,7 +8,6 @@ knitr::opts_chunk$set(
 library(gdi)
 
 ## -----------------------------------------------------------------------------
-
 fdir <- system.file(package="gdi")
 
 measurements_lateral <- measuresil(file.path(fdir,"exdata","lat.png"))
@@ -53,4 +52,17 @@ gdi(measurements_lateral, measurements_lateral*0.9, scale=100)
 ## -----------------------------------------------------------------------------
 aspect_ratio <- cscorr(file.path(fdir,"exdata","cross_section.png"))
 print(aspect_ratio)
+
+## -----------------------------------------------------------------------------
+hindlimb_lateral <- measuresil(file.path(fdir,"exdata","hl.png"),align="v")
+forelimb_lateral <- measuresil(file.path(fdir,"exdata","fl.png"), align="v")
+
+## -----------------------------------------------------------------------------
+gdi(hindlimb_lateral,0.7*hindlimb_lateral,scale=100)->hindlimb
+gdi(forelimb_lateral, 0.7*forelimb_lateral, scale=100)->forelimb
+gdi(measurements_lateral, measurements_dorsal, scale=100, method="raw")->axial_total
+knitr::kable(data.frame(axial_total, forelimb, hindlimb))
+
+## -----------------------------------------------------------------------------
+axial_total+2*forelimb+2*hindlimb
 

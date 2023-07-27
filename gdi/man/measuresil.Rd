@@ -9,7 +9,8 @@ measuresil(
   threshold = 0.5,
   channel = 4,
   method = "greater",
-  align = "h"
+  align = "h",
+  return = "diameters"
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ measuresil(
 \item{method}{Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.}
 
 \item{align}{Indicate whether the silhouette long axis is aligned horizontally (setting "h", default), or vertically (any other parameter setting).}
+
+\item{return}{Setting for what to return, default setting ("diameters") returns a single vector containing the diameters, any other setting returns a data frame containing centers and diameters.}
 }
 \value{
 A numeric vector giving the measurements of the silhouette

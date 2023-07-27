@@ -1,0 +1,130 @@
+---
+title: "Estimating Centre of Mass"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Estimating Centre of Mass}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(gdi)
+```
+**Basic Workflow for COM Estimation**
+
+This vignette demonstrates use of the gdi package for estimating the position of the center of mass (COM) of an animal body.
+
+As with volume estimation, the process starts with aligned silhouette images representing at least two views, which we measure and then perform gdi() on (for details, see vignette: gdi).
+
+For this example, we will import the sample images provided with the package:
+```{r}
+fdir <- system.file(package="gdi")
+
+measurements_lateral <- measuresil(file.path(fdir,"exdata","lat.png"), return="all") # using the "return" parameter, we can make measuresil output a data.frame containing the centers on the y axis
+measurements_dorsal <- measuresil(file.path(fdir,"exdata","dors.png")) #because our organism is bilaterally symmetric, we are not interested in the location of the COM on the transverse axis, and can therefore disregard recording centers for the dorsal view
+```
+We now have a data.frame containing the respective y centers and the diameters, which should look like this:
+
+```{r}
+knitr::kable(head(measurements_lateral, 10))
+```
+
+To perform a graphic double integration to get the volumes, simply do:
+```{r}
+gdi(measurements_lateral, measurements_dorsal, scale=100, return="all")->gdiresults # the parameter setting for "return" makes gdi() return a data.frame with all individual segment volumes, rather than only a single volume for the entire shape
+```
+We now have a data.frame containing the respective segment volumes and y-axis centers, rather than the single numeric containing the total volume for the same shape (`r round(gdi(measurements_lateral,measurements_dorsal,scale=100))` l). Our resulting data.frame should look like this:
+
+```{r}
+knitr::kable(head(gdiresults))
+```
+We can now pass this data.frame on to the functions hCOM() and vCOM(), for estimating the horizontal and vertical COM position, calculated from the x and y coordinates for the segments, weighted by their respective volumes:
+
+```{r}
+hCOM(gdiresults)
+vCOM(gdiresults)
+```
+
+For now, these methods only work for the "raw" method of gdi(), i.e. treating each segment as an elliptical prism. They can, however, also be used with manually supplied vectors with segment COM positions, if desired. We will cover the automatic way, using the outputs of gdi() and measuresil() here, and assume a silhouette with sufficient resolution to make simple prismatic approximation accurate.
+
+So the coordinates, in pixels, of the estimated center of mass of the shape are approximately `r round(hCOM(gdiresults))` horizontally, and `r round(vCOM(gdiresults))` vertically.
+
+
+We can visualize the results using the function plot.sil():
+
+```{r, echo=FALSE, fig.cap="Plotted silhouette, with horizontal and vertical COM position marked."}
+plot.sil(measurements_lateral, asp=1)
+points(hCOM(gdiresults),vCOM(gdiresults))
+abline(v=hCOM(gdiresults), lty=2)
+abline(h=vCOM(gdiresults), lty=2)
+```
+
+In addition, the functions have options for supplying a vector of volumes to be subtracted (e.g. internal airspaces, parameter "subtract") or of segment densities (parameter "densities") to use in calculation of COM position.
+
+**More Complex Shapes**
+
+As with volume estimation, protruding elements, such as limbs, are best estimated separately and then combined as a final step.
+
+```{r}
+hindlimb_lateral <- measuresil(file.path(fdir,"exdata","hl.png"),align="v", return="all")
+forelimb_lateral <- measuresil(file.path(fdir,"exdata","fl.png"), align="v", return="all")
+
+hl<-gdi(hindlimb_lateral,0.7*hindlimb_lateral,scale=100, return="all")
+fl<-gdi(forelimb_lateral, 0.7*forelimb_lateral, scale=100, return="all")
+```
+
+Here we need to keep in mind that the orientation of the different elements is not the same. Since we are measuring the silhouettes of the limbs as vertically aligned, we have to use vCOM() instead of hCOM() and hCOM() instead of vCOM(). Moreover, care needs to be taken with pixel coordinates, as these are measured from top down in an image, but from bottom up in plots.
+
+Hence, it is recommended to use the built-in plotting function to verify plausibility of results:
+
+```{r, echo=FALSE, fig.cap="Plotted silhouette, including limbs and individual segment COM positions"}
+plot.sil(measurements_lateral, asp=1)
+plot.sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
+plot.sil(hindlimb_lateral, flip=T, add=T)
+
+points(hCOM(gdiresults),vCOM(gdiresults))#plot COM of axial segment
+points(vCOM(fl),hCOM(fl,align="v"))#plot COM of forelimb segment
+points(vCOM(hl),hCOM(hl,align="v"))#plot COM of forelimb segment
+```
+
+As we can see, our COM positions seem to be correctly aligned. As you can see we additionally specify align="v" with hCOM for the limb segments, because the horizontal values of the vertically aligned silhouette are measured from the top down. 
+If we want to know the overall COM position, we can now simply take a weighted mean of all the segments. For this we need segment volumes as a weighting factor, which we can easily calculate:
+```{r}
+gdi(hindlimb_lateral,0.7*hindlimb_lateral,scale=100)->hindlimbV
+gdi(forelimb_lateral, 0.7*forelimb_lateral, scale=100)->forelimbV
+gdi(measurements_lateral, measurements_dorsal, scale=100, method="raw")->axialV
+```
+
+We can now create a table of individual segment volumes and COM positions:
+```{r}
+volumes<-c(axialV, forelimbV, hindlimbV)
+x_COM<-c(hCOM(gdiresults), vCOM(fl), vCOM(hl))
+y_COM<-c(vCOM(gdiresults), hCOM(fl, align="v"), hCOM(hl,align="v"))
+knitr::kable(data.frame(volumes,x_COM,y_COM, row.names=c("axial_total","forelimb","hindlimb")))
+```
+
+Finally, overall COM is calculated as the weighted mean of all segment values:
+
+```{r}
+weighted.mean(x_COM,w=volumes*c(1,2,2))#horizontal COM position
+weighted.mean(y_COM,w=volumes*c(1,2,2))#vertical COM position
+```
+
+```{r, echo=FALSE, fig.cap="Plotted silhouette with overall COM position highlighted"}
+plot.sil(measurements_lateral, asp=1)
+plot.sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
+plot.sil(hindlimb_lateral, flip=T, add=T)
+
+points(weighted.mean(x_COM,w=volumes*c(1,2,2)), weighted.mean(y_COM,w=volumes*c(1,2,2)), pch=16)
+abline(v=weighted.mean(x_COM,w=volumes*c(1,2,2)), lty=2)
+abline(h=weighted.mean(y_COM,w=volumes*c(1,2,2)), lty=2)
+```
+
+It should be noted that precision with vertical COM position estimation is limited compared to the horizontal position, as differences in density can be taken into account to the nearest pixel for the latter, while for the former the centroid of each (elliptical or superelliptical) cross-section is calculated, irrespective of heterogeneous densities or differences in internal composition throughout the structure.

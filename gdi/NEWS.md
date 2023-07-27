@@ -1,3 +1,12 @@
+gdi v1.4.0 (Release date: 2023-07-27)
+==============
+
+Changes:
+* added functions vCOM and hCOM and modified measuresil() and gdi() to allow estimating centre of mass (COM) position
+* added function plot.sil() to plot silhouettes
+
+
+
 gdi v1.3.1 (Release date: 2023-07-22)
 ==============
 

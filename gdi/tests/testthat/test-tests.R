@@ -29,9 +29,10 @@ expect_equal(as.numeric(signif(cscorr(system.file("exdata","cross_section.png", 
 
 test_that("measuresil() works", {
 lat<-measuresil(system.file("exdata","lat.png", package="gdi"))
+dors<-measuresil(system.file("exdata","dors.png", package="gdi"))
 
-expect_equal(signif(lat[250],7), signif(69,7))
-expect_equal(signif(lat[400],7), signif(83,7))
+expect_equal(signif(lat[250],7), signif(68,7))
+expect_equal(signif(lat[400],7), signif(82,7))
 
 })
 
@@ -42,6 +43,13 @@ exp <- 0.7853982
 names(exp)<-paste("x_dim",sum(c(1)!=0)/1, "units", sep="_")
 
 expect_equal(signif(result,7), signif(exp,7))
+
+lat<-measuresil(system.file("exdata","lat.png", package="gdi"))
+dors<-measuresil(system.file("exdata","dors.png", package="gdi"))
+
+expect_equal(signif(as.numeric(gdi(lat,dors, scale=10)),7), signif(40256.77,7))
+
+
 
 })
 
