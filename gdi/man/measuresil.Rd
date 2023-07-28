@@ -18,7 +18,7 @@ measuresil(
 
 \item{threshold}{Reference value for colour criterium after which pixels that are part of the silhouette are differentiated from the background.}
 
-\item{channel}{Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).}
+\item{channel}{Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image with transparency, and 3 in an rgb image without transparency, or 4 in a full rgba image).}
 
 \item{method}{Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.}
 

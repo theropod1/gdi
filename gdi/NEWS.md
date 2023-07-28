@@ -1,3 +1,10 @@
+gdi v1.4.1 (Release date: 2023-07-28)
+==============
+
+Changes:
+* modifications to image-processing functions to deal with single-channel images
+
+
 gdi v1.4.0 (Release date: 2023-07-28)
 ==============
 

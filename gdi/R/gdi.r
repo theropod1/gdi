@@ -82,55 +82,67 @@ img<-image_file
 nrows <- dim(img)[1]
 ncols <- dim(img)[2]
 
+if(!is.na(dim(img)[3])#if image has more than one channel, i.e. is an array, reduce the image to the channel to be analyzed
+){
+img<-img[,,channel]
+}
+
 ##find maximum depth of cross-section
 d <- numeric(0)
 #loop through vertical lines of pixels, find all rows in which there are pixels that are part of the cross-section
 for(x in 1:ncols){
     if(method=="greater"){
-    d <- union(d,which(img[,x,channel]>threshold))
+    d <- union(d,which(img[,x]>threshold))
     }else if(method=="less"){
-    d <- union(d,which(img[,x,channel]<threshold))
+    d <- union(d,which(img[,x]<threshold))
     }else if(method=="not"){
-    d <- union(d,which(signif(img[,x,channel],6)!=signif(threshold,6)))
+    d <- union(d,which(signif(img[,x],6)!=signif(threshold,6)))
     }else{
-    d <- union(d,which(signif(img[,x,channel],6)==signif(threshold,6)))
+    d <- union(d,which(signif(img[,x],6)==signif(threshold,6)))
     }
 }
+
+
+
 vdiam <- length(d)/scale #calculate maximum depth in pixels
 
 ##find maximum width of cross-section
 d <- numeric(0)
 #loop through horizontal lines of pixels, find all columns in which there are pixels that are part of the cross-section
+
 for(y in 1:nrows){
     if(method=="greater"){
-    d <- union(d,which(img[y,,channel]>threshold))
+    d <- union(d,which(img[y,]>threshold))
     }else if(method=="less"){
-    d <- union(d,which(img[y,,channel]<threshold))
+    d <- union(d,which(img[y,]<threshold))
     }else if(method=="not"){
-    d <- union( d,which( signif(img[y,,channel],6)!=signif(threshold,6)) )
+    d <- union( d,which( signif(img[y,],6)!=signif(threshold,6)) )
     }else{
-    d <- union( d,which( signif(img[y,,channel],6)==signif(threshold,6)) )
+    d <- union( d,which( signif(img[y,],6)==signif(threshold,6)) )
     }
 }
+
+
+
 hdiam <- length(d)/scale #calculate maximum width in pixels
 
 
-# calculate (super)elliptical cross-sectional area:
+## calculate (super)elliptical cross-sectional area:
 ecomp <- sellipse(vdiam/2, hdiam/2, k)
 
-# calculate actual cross-sectional area
+    ## calculate actual cross-sectional area
     if(method=="greater"){
-    area <- sum(img[,,channel]>threshold)
+    area <- sum(img[,]>threshold)
     }else if(method=="less"){
-    area <- sum(img[,,channel]<threshold)
+    area <- sum(img[,]<threshold)
     }else if(method=="not"){
-    area <- sum( signif(img[,,channel],6)!=signif(threshold,6) )
+    area <- sum( signif(img[,],6)!=signif(threshold,6) )
     }else{
-    area <- sum( signif(img[,,channel],6)==signif(threshold,6) )
+    area <- sum( signif(img[,],6)==signif(threshold,6) )
     }
     area<-area/scale^2#set scale for area
   
-  # Return the calculated area or ratio
+    ## Return the calculated area or ratio
   if(return=="area"){return(area)
   }else if(return=="area_corr"){
   return(area/ecomp)
@@ -150,7 +162,7 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
 #'
 #' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.
 #' @param threshold Reference value for colour criterium after which pixels that are part of the silhouette are differentiated from the background.
-#' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
+#' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image with transparency, and 3 in an rgb image without transparency, or 4 in a full rgba image).
 #' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
 #' @param align Indicate whether the silhouette long axis is aligned horizontally (setting "h", default), or vertically (any other parameter setting).
 #' @param return Setting for what to return, default setting ("diameters") returns a single vector containing the diameters, any other setting returns a data frame containing centers and diameters.
@@ -178,20 +190,27 @@ img<-image_file
 nrows <- dim(img)[1]
 ncols <- dim(img)[2]
 
+if(!is.na(dim(img)[3])#if image has more than one channel, i.e. is an array, reduce the image to the channel to be analyzed
+){
+img<-img[,,channel]
+}
+
 if(align=="h"){#if horizontally aligned, default
 # Loop through each vertical line of pixels
 depths <- rep(0, ncols)
 centers <- rep(NA, ncols)
 
+
+
 for (x in 1:ncols) {
         if(method=="greater"){
-        s<-which(img[, x, channel]>threshold)
+        s<-which(img[, x]>threshold)
         }else if(method=="less"){
-        s<-which(img[, x, channel]<threshold)
+        s<-which(img[, x]<threshold)
         }else if(method=="not"){
-        s<-which(signif(img[, x, channel],6)!=signif(threshold,6))
+        s<-which(signif(img[, x],6)!=signif(threshold,6))
         }else{
-        s<-which(signif(img[, x, channel],6)==signif(threshold,6))
+        s<-which(signif(img[, x],6)==signif(threshold,6))
         }
         
         if(return!="diameters"){
@@ -207,13 +226,13 @@ centers <- rep(NA, nrows)
 
 for (y in 1:nrows) {
     if(method=="greater"){
-    s<-which(img[y,,channel]>threshold)
+    s<-which(img[y,]>threshold)
     }else if(method=="less"){
-    s<-which(img[y,,channel]<threshold)
+    s<-which(img[y,]<threshold)
     }else if(method=="not"){
-    s<-which(signif(img[y,,channel],6)!=signif(threshold,6))
+    s<-which(signif(img[y,],6)!=signif(threshold,6))
     }else{
-    s<-which(signif(img[y,,channel],6)==signif(threshold,6))
+    s<-which(signif(img[y,],6)==signif(threshold,6))
     }
     
     if(return!="diameters"){
@@ -361,9 +380,13 @@ img<-image_file
 
 nrows <- dim(img)[1]
 ncols <- dim(img)[2]
+if(!is.na(dim(img)[3])#if image has more than one channel, i.e. is an array, reduce the image to the channel to be analyzed
+){
+img<-img[,,channel]
+}
 
 #extract picture edges:
-edges <- c(img[1,,channel],img[nrows,,channel],img[,1,channel],img[,ncols,channel])
+edges <- c(img[1,],img[nrows,],img[,1],img[,ncols])
 
 out <- list()
 out$edgetable <- table(edges)
@@ -427,16 +450,20 @@ if(!is.character(image_file)){
 img<-image_file
 }
 
+if(!is.na(dim(img)[3])#if image has more than one channel, i.e. is an array, reduce the image to the channel to be analyzed
+){
+img<-img[,,channel]
+}
 
 if(plot==TRUE){#show histogram
-hist(img[,,channel], prob=TRUE, breaks=breaks, xlab=paste("All pixel colour values in channel", channel))
-lines(density(img[,,channel]), col="grey", lwd=2)
+hist(img[,], prob=TRUE, breaks=breaks, xlab=paste("All pixel colour values in channel", channel))
+lines(density(img[,]), col="grey", lwd=2)
 abline(v=threshold)}
 
-total <- length(img[,,channel])
+total <- length(img[,])
 
 if(unique==FALSE){
-h <- hist(img[,,channel], breaks=breaks, plot=FALSE)
+h <- hist(img[,], breaks=breaks, plot=FALSE)
 names<-h$mids
 h <- h$counts
 h <- cbind(h,h/total)
@@ -446,7 +473,7 @@ return(h)
 }
 
 if(unique==TRUE){
-counts <- table(img[,,channel])
+counts <- table(img[,])
 sorted <- sort(counts, decreasing=TRUE)
 names <- names(sorted)
 sorted <- cbind(sorted, sorted/total)

@@ -1,8 +1,8 @@
 ---
-title: "Estimating Centre of Mass"
+title: "Estimating Center of Mass"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Estimating Centre of Mass}
+  %\VignetteIndexEntry{Estimating Center of Mass}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
