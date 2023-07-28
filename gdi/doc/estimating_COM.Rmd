@@ -57,10 +57,10 @@ For now, these methods only work for the "raw" method of gdi(), i.e. treating ea
 So the coordinates, in pixels, of the estimated center of mass of the shape are approximately `r round(hCOM(gdiresults))` horizontally, and `r round(vCOM(gdiresults))` vertically.
 
 
-We can visualize the results using the function plot.sil():
+We can visualize the results using the function plot_sil():
 
 ```{r, echo=FALSE, fig.cap="Plotted silhouette, with horizontal and vertical COM position marked."}
-plot.sil(measurements_lateral, asp=1)
+plot_sil(measurements_lateral, asp=1)
 points(hCOM(gdiresults),vCOM(gdiresults))
 abline(v=hCOM(gdiresults), lty=2)
 abline(h=vCOM(gdiresults), lty=2)
@@ -85,9 +85,9 @@ Here we need to keep in mind that the orientation of the different elements is n
 Hence, it is recommended to use the built-in plotting function to verify plausibility of results:
 
 ```{r, echo=FALSE, fig.cap="Plotted silhouette, including limbs and individual segment COM positions"}
-plot.sil(measurements_lateral, asp=1)
-plot.sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
-plot.sil(hindlimb_lateral, flip=T, add=T)
+plot_sil(measurements_lateral, asp=1)
+plot_sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
+plot_sil(hindlimb_lateral, flip=T, add=T)
 
 points(hCOM(gdiresults),vCOM(gdiresults))#plot COM of axial segment
 points(vCOM(fl),hCOM(fl,align="v"))#plot COM of forelimb segment
@@ -118,9 +118,9 @@ weighted.mean(y_COM,w=volumes*c(1,2,2))#vertical COM position
 ```
 
 ```{r, echo=FALSE, fig.cap="Plotted silhouette with overall COM position highlighted"}
-plot.sil(measurements_lateral, asp=1)
-plot.sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
-plot.sil(hindlimb_lateral, flip=T, add=T)
+plot_sil(measurements_lateral, asp=1)
+plot_sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
+plot_sil(hindlimb_lateral, flip=T, add=T)
 
 points(weighted.mean(x_COM,w=volumes*c(1,2,2)), weighted.mean(y_COM,w=volumes*c(1,2,2)), pch=16)
 abline(v=weighted.mean(x_COM,w=volumes*c(1,2,2)), lty=2)

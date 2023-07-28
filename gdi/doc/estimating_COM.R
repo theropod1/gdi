@@ -27,7 +27,7 @@ hCOM(gdiresults)
 vCOM(gdiresults)
 
 ## ---- echo=FALSE, fig.cap="Plotted silhouette, with horizontal and vertical COM position marked."----
-plot.sil(measurements_lateral, asp=1)
+plot_sil(measurements_lateral, asp=1)
 points(hCOM(gdiresults),vCOM(gdiresults))
 abline(v=hCOM(gdiresults), lty=2)
 abline(h=vCOM(gdiresults), lty=2)
@@ -40,9 +40,9 @@ hl<-gdi(hindlimb_lateral,0.7*hindlimb_lateral,scale=100, return="all")
 fl<-gdi(forelimb_lateral, 0.7*forelimb_lateral, scale=100, return="all")
 
 ## ---- echo=FALSE, fig.cap="Plotted silhouette, including limbs and individual segment COM positions"----
-plot.sil(measurements_lateral, asp=1)
-plot.sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
-plot.sil(hindlimb_lateral, flip=T, add=T)
+plot_sil(measurements_lateral, asp=1)
+plot_sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
+plot_sil(hindlimb_lateral, flip=T, add=T)
 
 points(hCOM(gdiresults),vCOM(gdiresults))#plot COM of axial segment
 points(vCOM(fl),hCOM(fl,align="v"))#plot COM of forelimb segment
@@ -64,9 +64,9 @@ weighted.mean(x_COM,w=volumes*c(1,2,2))#horizontal COM position
 weighted.mean(y_COM,w=volumes*c(1,2,2))#vertical COM position
 
 ## ---- echo=FALSE, fig.cap="Plotted silhouette with overall COM position highlighted"----
-plot.sil(measurements_lateral, asp=1)
-plot.sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
-plot.sil(hindlimb_lateral, flip=T, add=T)
+plot_sil(measurements_lateral, asp=1)
+plot_sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
+plot_sil(hindlimb_lateral, flip=T, add=T)
 
 points(weighted.mean(x_COM,w=volumes*c(1,2,2)), weighted.mean(y_COM,w=volumes*c(1,2,2)), pch=16)
 abline(v=weighted.mean(x_COM,w=volumes*c(1,2,2)), lty=2)

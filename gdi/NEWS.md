@@ -2,7 +2,7 @@ gdi v1.4.0 (Release date: 2023-07-28)
 ==============
 
 Changes:
-* added functions vCOM and hCOM and modified measuresil() and gdi() to allow estimating centre of mass (COM) position
+* added functions vCOM and hCOM and expanded functionality of measuresil() and gdi() to allow estimating the position of the center of mass (COM)
 * added function plot_sil() to plot silhouettes
 
 
@@ -40,7 +40,7 @@ gdi v1.2.1 (Release date: 2023-05-05)
 
 Changes:
 * added tests using package 'testthat'
-* gdi() now also reports the horizontal length of the silhouette as name of output (in the same unit cubed to calculate volume, i.e. decimeters if volume is metres), intended to quickly spot scaling errors
+* gdi() now also reports the horizontal length of the silhouette as name of output (in the same unit cubed to calculate volume, i.e. decimeters if volume is intended in liters), intended to quickly spot scaling errors
 
 gdi v1.2.0 (Release date: 2023-05-04)
 ==============

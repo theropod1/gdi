@@ -46,7 +46,7 @@ We can now **perform our graphic double integration to estimate the volume**:
 gdi(measurements_lateral, measurements_dorsal, scale=100, method="raw")
 gdi(measurements_lateral, measurements_dorsal, scale=100, method="smooth")
 ```
-The result of this function is the estimated volume in the chosen unit of measurements. The silhouette is at a scale of 100px:10cm, so a scale value of 100 will report the volume in litres (cubic decimetres), namely `r gdi(measurements_lateral, measurements_dorsal, scale=100, method="smooth")` for this example. 
+The result of this function is the estimated volume in the chosen unit of measurements. The silhouette is at a scale of 100px:10cm, so a scale value of 100 will report the volume in liters (cubic decimeters), namely `r gdi(measurements_lateral, measurements_dorsal, scale=100, method="smooth")` for this example. 
 The principal difference between "raw" and "smooth" for the parameter "method" is that "raw" approximates the body as a stack of elliptical cylinders ("classic" gdi), whereas "smooth" approximates it as a sequence of elliptical frusta (with base areas based on the diameters of segments i and i+1).
 
 To illustrate the difference, consider the following example:

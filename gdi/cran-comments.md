@@ -73,9 +73,45 @@ Maintainer: ‘Darius Nau <dariusnau@gmx.at>’
 * DONE
 Status: OK
 
+## devtools::check()
+── R CMD check results ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── gdi 1.4.0 ────
+Duration: 42.8s
+
+0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+
+
 
 
 ## devtools::check_rhub()
+── gdi 1.4.0: NOTE
+
+  Build ID:   gdi_1.4.0.tar.gz-46042517399d43d1961aef7e3ecbad9e
+  Platform:   Windows Server 2022, R-devel, 64 bit
+  Submitted:  3m 23.4s ago
+  Build time: 3m 20.5s
+
+❯ checking for non-standard things in the check directory ... NOTE
+  Found the following files/directories:
+    ''NULL''
+
+❯ checking for detritus in the temp directory ... NOTE
+  Found the following files/directories:
+    'lastMiKTeXException'
+
+0 errors ✔ | 0 warnings ✔ | 2 notes ✖
+
+── gdi 1.4.0: IN-PROGRESS
+
+  Build ID:   gdi_1.4.0.tar.gz-b7d4911848a543ff8a220de6fde270a0
+  Platform:   Ubuntu Linux 20.04.1 LTS, R-release, GCC
+  Submitted:  3m 23.5s ago
+
+
+── gdi 1.4.0: IN-PROGRESS
+
+  Build ID:   gdi_1.4.0.tar.gz-cbd6c3fad42c4f76ba4969900193445e
+  Platform:   Fedora Linux, R-devel, clang, gfortran
+  Submitted:  3m 23.5s ago
 
 
 ## devtools::check_win_devel()
