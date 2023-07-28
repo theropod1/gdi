@@ -49,7 +49,19 @@ dors<-measuresil(system.file("exdata","dors.png", package="gdi"))
 
 expect_equal(signif(as.numeric(gdi(lat,dors, scale=10)),7), signif(40256.77,7))
 
+})
 
+
+test_that("hCOM() and vCOM work", {
+
+lat<-measuresil(system.file("exdata","lat.png", package="gdi"), return="all")
+dors<-measuresil(system.file("exdata","dors.png", package="gdi"), return="all")
+
+gdiresults<-gdi(lat,dors,return="all")
+
+expect_equal(signif(hCOM(gdiresults),5), signif(1005.173,5))
+expect_equal(signif(vCOM(gdiresults),5), signif(795.6165,5))
 
 })
+
 

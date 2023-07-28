@@ -2,16 +2,6 @@ version 1.4.0:
 >>The primary addition to this version is a plotting function, plot_sil(), for visualizing silhouettes used with the main functions of the package, and two functions for calculating the horizontal and vertical position of the center of mass (COM), COM() and hCOM(). Estimating COM positions is often of importance for drawing inferences about posture and locomotion in extinct organism, e.g. determining whether an animal was quadrupedal or bipedal.
 
 ## locally running R CMD check --as-cran
-* checking for file ‘gdi/DESCRIPTION’ ... OK
-* preparing ‘gdi’:
-* checking DESCRIPTION meta-information ... OK
-* installing the package to build vignettes
-* creating vignettes ... OK
-* checking for LF line-endings in source and make files and shell scripts
-* checking for empty or unneeded directories
-* building ‘gdi_1.4.0.tar.gz’
-
-* using log directory ‘/home/suirad/Documents/research_projects/gdi_package/gdi.Rcheck’
 * using R version 4.3.1 (2023-06-16)
 * using platform: x86_64-pc-linux-gnu (64-bit)
 * R was compiled by
@@ -23,7 +13,7 @@ version 1.4.0:
 * checking for file ‘gdi/DESCRIPTION’ ... OK
 * this is package ‘gdi’ version ‘1.4.0’
 * package encoding: UTF-8
-* checking CRAN incoming feasibility ... [12s/17s] Note_to_CRAN_maintainers
+* checking CRAN incoming feasibility ... [11s/16s] Note_to_CRAN_maintainers
 Maintainer: ‘Darius Nau <dariusnau@gmx.at>’
 * checking package namespace information ... OK
 * checking package dependencies ... OK
@@ -69,20 +59,18 @@ Maintainer: ‘Darius Nau <dariusnau@gmx.at>’
 * checking for unstated dependencies in examples ... OK
 * checking installed files from ‘inst/doc’ ... OK
 * checking files in ‘vignettes’ ... OK
-* checking examples ... [11s/11s] OK
+* checking examples ... OK
 * checking for unstated dependencies in ‘tests’ ... OK
-* checking tests ...
+* checking tests ... OK
   Running ‘testthat.R’
- OK
 * checking for unstated dependencies in vignettes ... OK
 * checking package vignettes in ‘inst/doc’ ... OK
-* checking re-building of vignette outputs ... [19s/19s] OK
+* checking re-building of vignette outputs ... OK
 * checking PDF version of manual ... OK
 * checking HTML version of manual ... OK
 * checking for non-standard things in the check directory ... OK
 * checking for detritus in the temp directory ... OK
 * DONE
-
 Status: OK
 
 
