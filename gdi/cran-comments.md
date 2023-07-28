@@ -185,6 +185,8 @@ Duration: 45.6s
   Platform:   Ubuntu Linux 20.04.1 LTS, R-release, GCC
   Submitted:  3m 20.9s ago
 
+  * checking HTML version of manual ... NOTE
+Skipping checking HTML validation: no command 'tidy' found
 
 ── gdi 1.4.1: IN-PROGRESS
 
@@ -192,6 +194,16 @@ Duration: 45.6s
   Platform:   Fedora Linux, R-devel, clang, gfortran
   Submitted:  3m 20.9s ago
 
+* checking HTML version of manual ... NOTE
+Skipping checking HTML validation: no command 'tidy' found
   
 ## devtools::check_win_devel()
-
+this notification has been generated automatically.
+Your package gdi_1.4.1.tar.gz has been built (if working) and checked for Windows.
+Please check the log files and (if working) the binary package at:
+https://win-builder.r-project.org/TCJ3sc04dy87
+The files will be removed after roughly 72 hours.
+Installation time in seconds: 2
+Check time in seconds: 46
+Status: OK
+R Under development (unstable) (2023-07-27 r84767 ucrt)
