@@ -184,85 +184,43 @@ depths <- rep(0, ncols)
 centers <- rep(NA, ncols)
 
 for (x in 1:ncols) {
-  depth <- 0
         if(method=="greater"){
-        centers[x]<-nrows-mean(which(img[, x, channel]>threshold))
+        s<-which(img[, x, channel]>threshold)
         }else if(method=="less"){
-        centers[x]<-nrows-mean(which(img[, x, channel]<threshold))
+        s<-which(img[, x, channel]<threshold)
         }else if(method=="not"){
-        centers[x]<-nrows-mean(which(signif(img[, x, channel],6)!=signif(threshold,6)))
+        s<-which(signif(img[, x, channel],6)!=signif(threshold,6))
         }else{
-        centers[x]<-nrows-mean(which(signif(img[, x, channel],6)==signif(threshold,6)))
+        s<-which(signif(img[, x, channel],6)==signif(threshold,6))
         }
-  
-  for (y in 1:nrows) {
-    # Get the color of the selected colour channel of the pixel
-    color <- img[y, x, channel]
-    
-    #increment the depth if colour is greater than threshhold, e.g. transparency
-    if(method=="greater"){
-    if (color > threshold) {
-      depth <- depth + 1
-    }
-    }else if(method=="less"){
-    if (color < threshold) {
-      depth <- depth + 1
-    }
-    }else if(method=="not"){
-    if (signif(color,6) != signif(threshold,6)) {
-      depth <- depth + 1
-    }
-    }else{
-    if (signif(color,6) == signif(threshold,6)) {
-      depth <- depth + 1
-    }}}
-    
-  
-  depths[x] <- depth
-}
+        
+        if(return!="diameters"){
+        centers[x]<-nrows-mean(s)
+        }
+        depths[x]<-length(s)
+        }
+
 }else{#if vertically aligned
 # Loop through each horizontal line of pixels
 depths <- rep(0, nrows)
 centers <- rep(NA, nrows)
 
 for (y in 1:nrows) {
-  depth <- 0
-  
     if(method=="greater"){
-    centers[y]<-1+mean(which(img[y,,channel]>threshold))
+    s<-which(img[y,,channel]>threshold)
     }else if(method=="less"){
-    centers[y]<-1+mean(which(img[y,,channel]<threshold))
+    s<-which(img[y,,channel]<threshold)
     }else if(method=="not"){
-    centers[y]<-1+mean(which(signif(img[y,,channel],6)!=signif(threshold,6)))
+    s<-which(signif(img[y,,channel],6)!=signif(threshold,6))
     }else{
-    centers[y]<-1+mean(which(signif(img[y,,channel],6)==signif(threshold,6)))
+    s<-which(signif(img[y,,channel],6)==signif(threshold,6))
     }
-  
-  for (x in 1:ncols) {
-    # Get the color of the selected colour channel of the pixel
-    color <- img[y, x, channel]
     
-    #increment the depth if colour is greater than threshhold, e.g. transparency
-    if(method=="greater"){
-    if (color > threshold) {
-      depth <- depth + 1
+    if(return!="diameters"){
+    centers[y]<-1+mean(s)
     }
-    }else if(method=="less"){
-    if (color < threshold) {
-      depth <- depth + 1
+    depths[y]<-length(s)
     }
-    }else if(method=="not"){
-    if (signif(color,6) != signif(threshold,6)) {
-      depth <- depth + 1
-    }
-    }else{
-    if (signif(color,6) == signif(threshold,6)) {
-      depth <- depth + 1
-    }}}
-    
-  
-  depths[y] <- depth
-}
 
 }
 
@@ -590,7 +548,7 @@ return(weighted.mean(y_center, w=masses, na.rm=TRUE)/scale)
 
 
 
-##Function plot.sil()
+##Function plot_sil()
 #' Plots a silhouette read by measuresil()
 #'
 #' @param sil A data frame that is the output of measuresil(..., return="all"), containing the center and the diameter of the silhouette at each value for x.
@@ -598,15 +556,15 @@ return(weighted.mean(y_center, w=masses, na.rm=TRUE)/scale)
 #' @param add Whether to add to an existing plot
 #' @param ... Other parameters to pass on to plot() or lines()
 #' @return A plotted silhouette
-#' @export plot.sil
+#' @export plot_sil
 #' @importFrom graphics lines
 #' @importFrom graphics plot.default
 #' @examples
 #' fdir <- system.file(package="gdi")
 #' measuresil(file.path(fdir,"exdata","lat.png"), return="all")->lat_
-#' plot.sil(lat_)
+#' plot_sil(lat_)
 
-plot.sil<-function(sil, flip=FALSE, add=FALSE, ...){
+plot_sil<-function(sil, flip=FALSE, add=FALSE, ...){
 
 if(flip==FALSE){
 x<-c(1:nrow(sil),rev(1:nrow(sil)))
