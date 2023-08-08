@@ -1,3 +1,10 @@
+gdi v1.4.2 (Release date: 2023-08-08)
+==============
+
+Changes:
+* fixed bug in cscorr (returning inverse aspect ratios depending on settings) – now aspect ratio is always max horizontal diameter/max vertical diameter
+
+
 gdi v1.4.1 (Release date: 2023-07-28)
 ==============
 

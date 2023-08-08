@@ -147,7 +147,7 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
   }else if(return=="area_corr"){
   return(area/ecomp)
   }else if(return=="aspect_ratio"){
-  return(vdiam/hdiam)
+  return(hdiam/vdiam)
   }else if(return=="diameters"){
   diam<-c(x=hdiam, y=vdiam)
   return(diam)
