@@ -1,3 +1,11 @@
+gdi v1.5.0 (Release date: 2023-08-08)
+==============
+
+Changes:
+* added csI() function to calculate second moment of area for cross-sectional shapes
+
+
+
 gdi v1.4.2 (Release date: 2023-08-08)
 ==============
 

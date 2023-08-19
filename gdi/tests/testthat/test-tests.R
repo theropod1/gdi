@@ -65,3 +65,15 @@ expect_equal(signif(vCOM(gdiresults),5), signif(795.6165,5))
 })
 
 
+
+
+test_that("csI() works", {
+
+fdir <- system.file(package="gdi")
+
+expect_equal(as.numeric(signif(csI(file.path(fdir,"exdata","cross_section.png"))[1],7)), signif(1647771892,7))
+expect_equal(as.numeric(signif(csI(file.path(fdir,"exdata","cross_section.png"))[2],7)), signif(798511304,7))
+expect_equal(as.numeric(signif(csI(file.path(fdir,"exdata","cross_section.png"))[3],7)), signif(2446283196,7))
+
+
+})

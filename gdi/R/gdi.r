@@ -182,11 +182,11 @@ img <- jpeg::readJPEG(image_file)}#read image if it is jpg
 if(grepl(".png",image_file)==TRUE | grepl(".PNG",image_file)==TRUE){
 img <- png::readPNG(image_file)}#read image if it is png
 
-if(!is.character(image_file)){
+if(!is.character(image_file)){#if image file has already been read
 img<-image_file
 }
 
-#loop through silhouette and measure diameters
+#get dimensions
 nrows <- dim(img)[1]
 ncols <- dim(img)[2]
 
@@ -262,7 +262,7 @@ return(depthscenters)
 #' @param lat Measurements of diameter in lateral view/first of two orthogonal views to be used with the gdi. Can be either a numeric vector, a data.frame (output of measuresil(...,return="all") with a collumn named "diameter", or a text file with diameter measurements to be scanned.
 #' @param dors Measurements of diameter in dorsal view/second of two orthogonal views to be used with the gdi. Can be either a numeric vector, a data.frame (output of measuresil(...,return="all") with a collumn named "diameter", or a text file with diameter measurements to be scanned. Must be the same length as lat.
 #' @param indices Optional indices specifying a subset of the silhouette measurement vectors to be analyzed. Useful if separate segment calculations are desired.
-#' @param scale Scale of the data in terms of how many units of the input data are in one side of the desired unit of output volume. Defaults to 10.
+#' @param scale Scale of the data, given in terms of how many units of the input data (e.g. pixels) are in one side of the desired unit of output volume. Defaults to 10.
 #' @param sliceL Length of individual segments to be used in the GDI. Defaults to 1/scale.
 #' @param method Method to be used for the GDI. Default "raw" setting calculates each segment as an elliptical cylinder with volume = Area * SliceL. Any other string will result in volume being calculated as an elliptical frustum with base areas based on the measurements of segments i and i+1.
 #' @param k Superellipse exponent to be used for the cross-sectional area. Defaults to 2.0 (normal ellipse).
@@ -377,9 +377,10 @@ img <- png::readPNG(image_file)}#read image if it is png
 if(!is.character(image_file)){
 img<-image_file
 }
-
+#get dimensions
 nrows <- dim(img)[1]
 ncols <- dim(img)[2]
+
 if(!is.na(dim(img)[3])#if image has more than one channel, i.e. is an array, reduce the image to the channel to be analyzed
 ){
 img<-img[,,channel]
@@ -609,5 +610,106 @@ lines(y~x, ...)
 plot(y~x, type="l", xlab="x",ylab="y",...)
 
 }
+
+}
+
+
+
+
+##Function csI()
+#' Calculates the second moment of area (=area moment of inertia, Ix and Iy) and polar moment of inertia (Iz or J) for a cross-section given as an image.
+#'
+#' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.
+#' @param threshold Reference value for colour criterium after which pixels that are part of the silhouette should be differentiated from the background.
+#' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
+#' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
+#' @param scale Optional scale of the image (number of pixels per linear unit).
+#' @param return What to return, defaults to returning second moments of area and polar moment of inertia for the entire shape (if return=="total"), otherwise returns raw data matrix for all pixels.
+#' @return Either a data.frame containing Ix, Iy and Iz for the shape (default), or a matrix containing area moments and coordinates for each pixel in the image, as well as area moments converted relative to the common centroid of the shape using parallel axis theorem.
+#' @export csI
+#' @examples
+#' fdir <- system.file(package="gdi")
+#' csI(file.path(fdir,"exdata","cross_section.png"))
+
+csI<-function(image_file, threshold=0.5, channel=4, method="greater", scale=1, return="total"){
+#load and save image data to variable named img
+if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
+img <- jpeg::readJPEG(image_file)}#read image if it is jpg
+
+if(grepl(".png",image_file)==TRUE | grepl(".PNG",image_file)==TRUE){
+img <- png::readPNG(image_file)}#read image if it is png
+
+if(!is.character(image_file)){#if the image has already been read
+img<-image_file
+}
+
+#get dimensions
+nrows <- dim(img)[1]
+ncols <- dim(img)[2]
+
+if(!is.na(dim(img)[3])#if image has more than one channel, i.e. is an array, reduce the image to the channel to be analyzed
+){
+img<-img[,,channel]#img is now a matrix containing only the channel to be analyzed
+}
+
+width<-1/scale
+height<-1/scale
+
+#second moment of area for a square pixel
+Ix<-(width*height^3)/12#y direction
+Iy<-(width^3*height)/12#x direction
+
+moments<-matrix(nrow=length(img), ncol=6)
+colnames(moments)<-c("Ix","Iy","xpos", "ypos","Ix_","Iy_")
+
+##loop through each pixel of image and save area moments and coordinates for each pixel belonging to the shape
+i<-0#set index to start at 0
+    for (x in 1:ncols){#loop through collumns
+        for(y in 1:nrows){#loop through rows of collumn x
+i<-i+1#increment the index
+#select pixels belonging to shape depending on the method and threshold settings
+if(method=="greater" & img[y,x]>threshold){
+moments[i,1]<-Ix
+moments[i,2]<-Iy
+moments[i,3]<-x
+moments[i,4]<-y
+}else if(method=="less" & img[y,x]<threshold){
+moments[i,1]<-Ix
+moments[i,2]<-Iy
+moments[i,3]<-x
+moments[i,4]<-y
+}else if(method=="not" & img[y,x]!=threshold){
+moments[i,1]<-Ix
+moments[i,2]<-Iy
+moments[i,3]<-x
+moments[i,4]<-y
+}else if(img[y,x]==threshold){
+moments[i,1]<-Ix
+moments[i,2]<-Iy
+moments[i,3]<-x
+moments[i,4]<-y
+}
+
+        }
+    }#end of loop
+
+xcentroid<-mean(moments[,3], na.rm=T)#calculate centroid position for entire shape
+ycentroid<-mean(moments[,4], na.rm=T)
+
+#then use parallel axis theorem to convert pixel moments relative to overall centroid
+moments[,5]<-Ix+width*height*((moments[,4]-ycentroid)/scale)^2
+moments[,6]<-Iy+width*height*((moments[,3]-xcentroid)/scale)^2
+
+#sum up all individual pixel moments for shape:
+I_x_total<-sum(moments[,5],na.rm=T)
+I_y_total<-sum(moments[,6],na.rm=T)
+
+#calculate polar moment
+I_z_total<-sum(I_x_total, I_y_total)
+
+##return results
+if(return=="total"){
+return(data.frame(I_x_total, I_y_total, I_z_total))
+}else(return(moments))
 
 }

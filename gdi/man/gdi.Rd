@@ -24,7 +24,7 @@ gdi(
 
 \item{indices}{Optional indices specifying a subset of the silhouette measurement vectors to be analyzed. Useful if separate segment calculations are desired.}
 
-\item{scale}{Scale of the data in terms of how many units of the input data are in one side of the desired unit of output volume. Defaults to 10.}
+\item{scale}{Scale of the data, given in terms of how many units of the input data (e.g. pixels) are in one side of the desired unit of output volume. Defaults to 10.}
 
 \item{sliceL}{Length of individual segments to be used in the GDI. Defaults to 1/scale.}
 
