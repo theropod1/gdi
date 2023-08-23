@@ -1,4 +1,11 @@
-gdi v1.5.0 (Release date: 2023-08-08)
+gdi v1.5.1 (Release date: 2023-23-08)
+==============
+
+Changes:
+* added rotI() function to calculate rotational inertia of shapes
+
+
+gdi v1.5.0 (Release date: 2023-20-19)
 ==============
 
 Changes:

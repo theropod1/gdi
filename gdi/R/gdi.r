@@ -713,3 +713,79 @@ return(data.frame(I_x_total, I_y_total, I_z_total))
 }else(return(moments))
 
 }
+
+
+
+
+##Function rotI
+#' Calculates the rotational inertia of the body around the y axis. Only works with simple circular/elliptical and rectangular cross-sections, thus pixel-precise estimates are recommended.
+#'
+#' @param x Either a data frame that is structured like output of gdi(..., return="all") containing masses and diameters for pixe-wide segments, or a numeric vector of horizontal segment COM positions.
+#' @param dors_diam An optional vector of transverse diameters of the silhouette, required if not contained in the data.frame supplied to x.
+#' @param axis_coord An optional x coordinate of the axis of rotation (parallel to the y axis), defaults to the center of mass of the entire volume if not set.
+#' @param volumes An optional separate vector of volumes, required if x is not a data.frame containing them.
+#' @param densities An optional vector of segment densities, with length equal to the length or nrow() of x, to be multiplied with the volumes for the COM calculation. If both subtract and densities are supplied, the density is applied only to the "residual" volume that is left after subtraction.
+#' @param scale Scale value, i.e. number of pixels representing 1 m
+#' @return A numeric vector containing four elements: The total mass (on the basis of the gdi results and densities), the rotational inertia of the shape using a point mass approximation of each segment, rotational inertia using a cylindrical approximation for each segment, and rotational inertia using a cuboidal approximation (note that this only changes the mass distribution, while segment masses are still assumed to correspond to gdi results multiplied by optional densities).
+#' @export rotI
+#' @examples
+#' fdir <- system.file(package="gdi")
+#' measuresil(file.path(fdir,"exdata","lat.png"), return="all")->lat_
+#' measuresil(file.path(fdir,"exdata","dors.png"), return="all")->dors_
+#' gdi(lat_, dors_, return="all")->gdiresults
+#' rotI(gdiresults)
+
+
+rotI<-function(x, dors_diam=NULL, axis_coord=NULL, volumes=NULL, densities=NULL, scale=1){
+x_center<-x
+if(is.data.frame(x)){
+volumes<-x$V#look for collumn "V" containing segment volumes
+x_center<-c(1:nrow(x))-0.5#save horizontal COM positions based on segment numbers
+
+if(is.null(dors_diam)){dors_diam<-x$zdiam_raw}
+segL<-x$slice_length*(x$zdiam_raw/x$zdiam_scaled)
+}else{
+segL<-numeric(length(x_center))
+for(i in 1:length(x_center)-1){
+segL[i]<-x_center[i+1]-x_center[i]
+}
+segL[length(x_center)]<-segL[length(x_center)-1]
+}
+
+masses<-volumes
+if(is.null(densities)){densities<-1}#multiply by segment densities given as vector
+masses<-masses*densities#multiply by segment densities given as vector, or unit density
+
+if(is.null(axis_coord)){
+axis_coord<-gdi::hCOM(x=x_center, volumes=masses)
+}
+
+#set scale
+x_center/scale->x_center
+axis_coord/scale->axis_coord
+dors_diam/scale->dors_diam
+segL<-segL/scale
+
+##approximation assuming sections are point masses
+sum(abs(x_center-axis_coord)^2*masses)->point_I
+
+##complete calculation using cylindrical sections
+segment_I<-1/12*masses*segL^2+1/4*masses*(dors_diam/2)^2 # formula from https://en.wikiversity.org/wiki/PlanetPhysics/Rotational_Inertia_of_a_Solid_Cylinder
+#segment_I2<-1/12*masses*segL^2+masses*(dors_diam/2)^2#cuboid formula
+segment_I_corr<-segment_I+abs(x_center-axis_coord)^2*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
+
+sum(segment_I_corr, na.rm=T)->exact_I_cylinder#sum up results
+
+##complete calculation using cuboidal sections
+segment_I2<-1/12*masses*(segL^2+dors_diam^2) #equivalent formula from https://en.wikiversity.org/wiki/PlanetPhysics/Rotational_Inertia_of_a_Solid_Cylinder
+#segment_I2<-1/12*masses*segL^2+masses*(dors_diam/2)^2#cuboid formula
+segment_I2_corr<-segment_I2+abs(x_center-axis_coord)^2*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
+
+sum(segment_I2_corr, na.rm=T)->exact_I_cuboid#sum up results
+
+c(total_mass=sum(masses),I_point_masses=point_I, I_circular_cs=exact_I_cylinder,I_rectangular_cs=exact_I_cuboid)->results
+
+##return both point mass I and more exact I approximations
+return(results)
+
+}

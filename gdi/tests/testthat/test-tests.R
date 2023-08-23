@@ -77,3 +77,21 @@ expect_equal(as.numeric(signif(csI(file.path(fdir,"exdata","cross_section.png"))
 
 
 })
+
+
+test_that("rotI() works", {
+
+testdiam <- rep(10,100)#generate test data, in this case for a cylinder of diameter 10 and length 100
+gdi(testdiam, testdiam, return="all", scale=1)->gdi_test
+
+expect_equal(unname(signif(rotI(gdi_test)[1],7)), unname(signif(gdi(testdiam,testdiam,scale=1),7)))#test mass estimate
+
+expect_true(
+unname(signif(rotI(gdi_test)[3],7))>signif(rotI(gdi_test)[2],7)
+)#test that the point mass approximation is smaller than the cylindrical one
+
+expect_equal(unname(signif(rotI(gdi_test)[3],7)), signif(6594072.08,7))#test cylindrical approximation
+
+expect_equal(unname(signif(rotI(gdi_test)[4],7)), signif(6610434.542,7))#test cuboidal approximation
+
+})
