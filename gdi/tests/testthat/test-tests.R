@@ -6,6 +6,7 @@ expect_equal(fdetect(system.file("exdata","lat.png", package="gdi"))$most_common
 
 
 
+
 test_that("cscorr() works", {
 
 #test that area correction factor is calculated correctly
@@ -22,10 +23,14 @@ expect_equal(as.numeric(signif(cscorr(system.file("exdata","cross_section.png", 
 
 expect_equal(as.numeric(signif(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="all", scale=10)[5],4)), as.numeric(signif(cscorr(system.file("exdata","cross_section.png", package="gdi"), return="area_corr")[1],4)))
 
+matrix(rep(1,20), nrow=5)->img
 
-
+expect_equal(unname(signif(cscorr(img, return="rotI")[1],7)),unname(signif(cscorr(img, return="rotI")[2],7)))
+expect_equal(unname(signif(cscorr(img, return="rotI")[1],7)),signif(1.333333333,7))
   
 })
+
+
 
 test_that("measuresil() works", {
 lat<-measuresil(system.file("exdata","lat.png", package="gdi"))
@@ -79,6 +84,7 @@ expect_equal(as.numeric(signif(csI(file.path(fdir,"exdata","cross_section.png"))
 })
 
 
+
 test_that("rotI() works", {
 
 testdiam <- rep(10,100)#generate test data, in this case for a cylinder of diameter 10 and length 100
@@ -93,5 +99,8 @@ unname(signif(rotI(gdi_test)[3],7))>signif(rotI(gdi_test)[2],7)
 expect_equal(unname(signif(rotI(gdi_test)[3],7)), signif(6594072.08,7))#test cylindrical approximation
 
 expect_equal(unname(signif(rotI(gdi_test)[4],7)), signif(6610434.542,7))#test cuboidal approximation
+
+expect_equal(unname(signif(rotI(gdi_test, axis="roll")[2],7)), signif(98174.770,7))#test cuboidal approximation
+
 
 })

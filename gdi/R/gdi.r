@@ -48,16 +48,16 @@ sellipse.coo <- function(k, res=100) {
 
 
 ##Function cscorr()
-#'Measure and analyze cross-sectional geometry
+#' Measure and analyze cross-sectional geometry supplied as an image.
 #'
-#' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.
+#' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an array/matrix-type object in R.
 #' @param threshold Reference value for colour criterium after which pixels that are part of the cross-section are differentiated from the background.
 #' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
 #' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
-#' @param return What value to return. Possible values are "area_corr" (Default, returns ratio between measured area and area of ellipse with same horizontal and vertical diameters), "aspect_ratio" (returns aspect ratio), "diameters" (returns diameters) and "area" (returns area). Any other value for this parameter will prompt the function to return a vector containing all of these.
+#' @param return What value to return. Possible values are "area_corr" (Default, returns ratio between measured area and area of ellipse with same horizontal and vertical diameters), "aspect_ratio" (returns aspect ratio), "diameters" (returns diameters), "area" (returns area) and "rotI" (returns correction factors for rotational inertia calculations). Any other value for this parameter will prompt the function to return a vector containing all of these outputs.
 #' @param k optional superellipse exponent for the (super)ellipse to which the measurements should be compared (for the "area_corr" setting for the parameter return).
 #' @param scale Optional scale of the image (for raw area measurements).
-#' @return Either a numeric of length 1 (depending on the input of the return parameter), defaulting to the area correction factor (if return=="area_corr"), or (if return is left empty or does not match any of the predefined settings) a numeric vector of length 5 containing all the possible outputs (x and y diameters, aspect ratio, area and area correction factor).
+#' @return Either a numeric of length 1 (depending on the input of the return parameter), defaulting to the area correction factor (if return=="area_corr"), or (if return is left empty or does not match any of the predefined settings) a numeric vector with 8 elements, containing all the possible outputs (x and y diameters, aspect ratio, area and area correction factor, correction factors representing ratios of rotational inertia in x, y and z planes relative an ellipse of equal diameters).
 #' @import jpeg
 #' @import png
 #' @export cscorr
@@ -68,15 +68,15 @@ sellipse.coo <- function(k, res=100) {
 
 cscorr <- function(image_file, threshold=0.5, channel=4, method="greater", return="area_corr", k=2.0, scale=1) {
 #load and save image data to variable img
-if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
-img <- jpeg::readJPEG(image_file)}#read image if it is jpg
-
-if(grepl(".png",image_file)==TRUE | grepl(".PNG",image_file)==TRUE){
-img <- png::readPNG(image_file)}#read image if it is png
-
 if(!is.character(image_file)){
 img<-image_file
-}
+}else if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
+img <- jpeg::readJPEG(image_file)
+#read image if it is jpg
+}else if(grepl(".png",image_file)==TRUE | grepl(".PNG",image_file)==TRUE){
+img <- png::readPNG(image_file)}#read image if it is png
+
+
 
 # measure cross-section depth
 nrows <- dim(img)[1]
@@ -141,7 +141,66 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
     area <- sum( signif(img[,],6)==signif(threshold,6) )
     }
     area<-area/scale^2#set scale for area
-  
+    
+
+##rotational inertia contribution of 1 px², as rectangular plane
+Ix<-(1^2)*1/12*1/(area*scale^2)#x direction
+Iy<-(1^2)*1/12*1/(area*scale^2)#y direction
+
+moments<-matrix(nrow=length(img), ncol=6)
+colnames(moments)<-c("Ix","Iy","xpos", "ypos","Ix_","Iy_")
+##loop through each pixel of image and save area moments and coordinates for each pixel belonging to the shape
+i<-0#set index to start at 0
+    for (x in 1:ncols){#loop through collumns
+        for(y in 1:nrows){#loop through rows of collumn x
+i<-i+1#increment the index
+#select pixels belonging to shape depending on the method and threshold settings
+if(method=="greater" & img[y,x]>threshold){
+moments[i,1]<-Ix
+moments[i,2]<-Iy
+moments[i,3]<-x
+moments[i,4]<-y
+}else if(method=="less" & img[y,x]<threshold){
+moments[i,1]<-Ix
+moments[i,2]<-Iy
+moments[i,3]<-x
+moments[i,4]<-y
+}else if(method=="not" & img[y,x]!=threshold){
+moments[i,1]<-Ix
+moments[i,2]<-Iy
+moments[i,3]<-x
+moments[i,4]<-y
+}else if(img[y,x]==threshold){
+moments[i,1]<-Ix
+moments[i,2]<-Iy
+moments[i,3]<-x
+moments[i,4]<-y
+}
+
+        }
+    }#end of loop
+
+xcentroid<-mean(moments[,3], na.rm=T)#calculate centroid position for entire shape
+ycentroid<-mean(moments[,4], na.rm=T)
+
+#then use parallel axis theorem to convert pixel moments relative to overall centroid
+moments[,5]<-Ix+1/(area*scale^2)*(moments[,4]-ycentroid)^2
+moments[,6]<-Iy+1/(area*scale^2)*(moments[,3]-xcentroid)^2
+
+#sum up all individual pixel moments for shape:
+I_x_total<-sum(moments[,5],na.rm=T)
+I_y_total<-sum(moments[,6],na.rm=T)
+
+#calculate polar moment
+I_z_total<-sum(I_x_total, I_y_total)
+
+#rotational inertia for ellipse with same diameters
+ellipse_y<-1/16*(hdiam*scale)^2
+ellipse_x<-1/16*(vdiam*scale)^2
+ellipse_polar<-ellipse_y+ellipse_x
+
+I_corr<-c(I_x_total,I_y_total,I_z_total)/c(ellipse_x, ellipse_y, ellipse_polar)
+
     ## Return the calculated area or ratio
   if(return=="area"){return(area)
   }else if(return=="area_corr"){
@@ -151,10 +210,16 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
   }else if(return=="diameters"){
   diam<-c(x=hdiam, y=vdiam)
   return(diam)
-  }else{full<-c(x=hdiam, y=vdiam, asp=hdiam/vdiam, area=area, area_corr=area/ecomp)
+  }else if(return=="rotI"){
+  names(I_corr)<-c("I_corr_x_pitch","I_corr_y_yaw","I_corr_z_roll")
+  return(I_corr)
+  }else{full<-c(x=hdiam, y=vdiam, asp=hdiam/vdiam, area=area, area_corr=area/ecomp, I_corr)
   return(full)
     }
 }
+
+
+
 
 
 ##Function measuresil()
@@ -176,15 +241,14 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
 
 measuresil<-function(image_file, threshold=0.5, channel=4, method="greater", align="h", return="diameters"){
 #load and save image data to variable named img
-if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
-img <- jpeg::readJPEG(image_file)}#read image if it is jpg
-
-if(grepl(".png",image_file)==TRUE | grepl(".PNG",image_file)==TRUE){
+if(!is.character(image_file)){
+img<-image_file
+}else if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
+img <- jpeg::readJPEG(image_file)
+#read image if it is jpg
+}else if(grepl(".png",image_file)==TRUE | grepl(".PNG",image_file)==TRUE){
 img <- png::readPNG(image_file)}#read image if it is png
 
-if(!is.character(image_file)){#if image file has already been read
-img<-image_file
-}
 
 #get dimensions
 nrows <- dim(img)[1]
@@ -368,15 +432,14 @@ return(sil)}
 
 
 fdetect<-function(image_file, threshold=0.5, channel=4, plot=FALSE){
-if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
-img <- jpeg::readJPEG(image_file)}#read image if it is jpg
-
-if(grepl(".png",image_file)==TRUE | grepl(".PNG",image_file)==TRUE){
-img <- png::readPNG(image_file)}#read image if it is png
-
 if(!is.character(image_file)){
 img<-image_file
-}
+}else if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
+img <- jpeg::readJPEG(image_file)
+#read image if it is jpg
+}else if(grepl(".png",image_file)==TRUE | grepl(".PNG",image_file)==TRUE){
+img <- png::readPNG(image_file)}#read image if it is png
+
 #get dimensions
 nrows <- dim(img)[1]
 ncols <- dim(img)[2]
@@ -441,15 +504,14 @@ return(out)
 
 
 imghist <- function(image_file, threshold=0.5, channel=4, breaks=seq(0,1,0.05), plot=TRUE, unique=FALSE){
-if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
-img <- jpeg::readJPEG(image_file)}#read image if it is jpg
-
-if(grepl(".png",image_file)==TRUE | grepl(".PNG",image_file)==TRUE){
-img <- png::readPNG(image_file)}#read image if it is png
-
 if(!is.character(image_file)){
 img<-image_file
-}
+}else if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
+img <- jpeg::readJPEG(image_file)
+#read image if it is jpg
+}else if(grepl(".png",image_file)==TRUE | grepl(".PNG",image_file)==TRUE){
+img <- png::readPNG(image_file)}#read image if it is png
+
 
 if(!is.na(dim(img)[3])#if image has more than one channel, i.e. is an array, reduce the image to the channel to be analyzed
 ){
@@ -625,7 +687,7 @@ plot(y~x, type="l", xlab="x",ylab="y",...)
 #' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
 #' @param scale Optional scale of the image (number of pixels per linear unit).
 #' @param return What to return, defaults to returning second moments of area and polar moment of inertia for the entire shape (if return=="total"), otherwise returns raw data matrix for all pixels.
-#' @return Either a data.frame containing Ix, Iy and Iz for the shape (default), or a matrix containing area moments and coordinates for each pixel in the image, as well as area moments converted relative to the common centroid of the shape using parallel axis theorem.
+#' @return A numeric vector containing Ix, Iy and Iz for the shape (default), or a matrix containing area moments and coordinates for each pixel in the image, as well as area moments converted relative to the common centroid of the shape using parallel axis theorem.
 #' @export csI
 #' @examples
 #' fdir <- system.file(package="gdi")
@@ -633,15 +695,14 @@ plot(y~x, type="l", xlab="x",ylab="y",...)
 
 csI<-function(image_file, threshold=0.5, channel=4, method="greater", scale=1, return="total"){
 #load and save image data to variable named img
-if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
-img <- jpeg::readJPEG(image_file)}#read image if it is jpg
-
-if(grepl(".png",image_file)==TRUE | grepl(".PNG",image_file)==TRUE){
+if(!is.character(image_file)){
+img<-image_file
+}else if(grepl(".jpg",image_file)==TRUE | grepl(".jpeg",image_file)==TRUE | grepl(".JPG",image_file)==TRUE){
+img <- jpeg::readJPEG(image_file)
+#read image if it is jpg
+}else if(grepl(".png",image_file)==TRUE | grepl(".PNG",image_file)==TRUE){
 img <- png::readPNG(image_file)}#read image if it is png
 
-if(!is.character(image_file)){#if the image has already been read
-img<-image_file
-}
 
 #get dimensions
 nrows <- dim(img)[1]
@@ -656,8 +717,8 @@ width<-1/scale
 height<-1/scale
 
 #second moment of area for a square pixel
-Ix<-(width*height^3)/12#y direction
-Iy<-(width^3*height)/12#x direction
+Ix<-(width*height^3)/12#x direction
+Iy<-(width^3*height)/12#y direction
 
 moments<-matrix(nrow=length(img), ncol=6)
 colnames(moments)<-c("Ix","Iy","xpos", "ypos","Ix_","Iy_")
@@ -709,7 +770,7 @@ I_z_total<-sum(I_x_total, I_y_total)
 
 ##return results
 if(return=="total"){
-return(data.frame(I_x_total, I_y_total, I_z_total))
+return(c(I_x=I_x_total, I_y=I_y_total, I_z=I_z_total))
 }else(return(moments))
 
 }
@@ -718,15 +779,19 @@ return(data.frame(I_x_total, I_y_total, I_z_total))
 
 
 ##Function rotI
-#' Calculates the rotational inertia of the body around the y axis. Only works with simple circular/elliptical and rectangular cross-sections, thus pixel-precise estimates are recommended.
+#' Calculates the rotational inertia of a body. Only works with simple circular/elliptical and rectangular cross-sections, thus pixel-precise estimates are recommended.
 #'
-#' @param x Either a data frame that is structured like output of gdi(..., return="all") containing masses and diameters for pixe-wide segments, or a numeric vector of horizontal segment COM positions.
-#' @param dors_diam An optional vector of transverse diameters of the silhouette, required if not contained in the data.frame supplied to x.
-#' @param axis_coord An optional x coordinate of the axis of rotation (parallel to the y axis), defaults to the center of mass of the entire volume if not set.
+#' @param x Either a data frame that is structured like output of gdi(..., return="all") containing masses and diameters for pixel-wide segments, or a numeric vector of segment COM positions.
+#' @param y An optional vector of vertical (dorsoventral) segment COM positions.
+#' @param dors_diam An optional vector of transverse diameters of the silhouette, required if not contained in x.
+#' @param lat_diam An optional vector of vertical diameters of the silhouette, required if not contained in x. Needed if inertia for "roll" or "pitch" should be calculated.
+#' @param axis_coord An optional coordinate of the axis of rotation, defaults to the center of mass of the entire volume if not set.
+#' @param axis Axis of rotation, defaults to "yaw" (i.e. rotation around vertical axis), can also be "pitch" (rotation around transverse axis) or "roll" (rotation around horizontal axis). For yaw rotation, the body is assumed to be bilaterally symmetrical, whereas for pitch rotation, dorsoventral variation in COM of segments is taken into account.
 #' @param volumes An optional separate vector of volumes, required if x is not a data.frame containing them.
-#' @param densities An optional vector of segment densities, with length equal to the length or nrow() of x, to be multiplied with the volumes for the COM calculation. If both subtract and densities are supplied, the density is applied only to the "residual" volume that is left after subtraction.
+#' @param corr An optional correction factor for the cross-sectional shape, given as the ratio between the characteristic mass moment of inertia of a plane with the given shape (e.g. determined by cscorr()) and an elliptical plane with the same diameters and assigned mass. Allows the calculation of moments of inertia for bodies with arbitrary cross-sectional shapes.
+#' @param densities An optional vector of segment densities, with length equal to the length or nrow() of x, to be multiplied with the volumes to calculate masses used in the inertial calculation.
 #' @param scale Scale value, i.e. number of pixels representing 1 m
-#' @return A numeric vector containing four elements: The total mass (on the basis of the gdi results and densities), the rotational inertia of the shape using a point mass approximation of each segment, rotational inertia using a cylindrical approximation for each segment, and rotational inertia using a cuboidal approximation (note that this only changes the mass distribution, while segment masses are still assumed to correspond to gdi results multiplied by optional densities).
+#' @return A numeric vector containing: The total mass (on the basis of gdi volumes and optional densities), the rotational inertia of the shape using a point mass approximation of each segment (yaw/pitch rotation only), rotational inertia using a cylindrical approximation for each segment, rotational inertia using a cuboidal approximation (note that this only changes the mass distribution, while segment masses are still assumed to correspond to gdi results multiplied by optional densities), and rotational inertia using a corrected cylindrical approximation based on value for corr.
 #' @export rotI
 #' @examples
 #' fdir <- system.file(package="gdi")
@@ -736,13 +801,20 @@ return(data.frame(I_x_total, I_y_total, I_z_total))
 #' rotI(gdiresults)
 
 
-rotI<-function(x, dors_diam=NULL, axis_coord=NULL, volumes=NULL, densities=NULL, scale=1){
+rotI<-function(x,y=NULL, dors_diam=NULL, lat_diam=NULL, axis_coord=NULL, axis="yaw", volumes=NULL, densities=1, corr=1, scale=1){
 x_center<-x
+
 if(is.data.frame(x)){
 volumes<-x$V#look for collumn "V" containing segment volumes
-x_center<-c(1:nrow(x))-0.5#save horizontal COM positions based on segment numbers
 
-if(is.null(dors_diam)){dors_diam<-x$zdiam_raw}
+x_center<-c(1:nrow(x))-0.5#save horizontal COM positions based on segment numbers
+if(is.numeric(x$y_center)){
+y_center<-x$y_center#save vertical COM positions (perpendicular to cross-section) based on vertical segment COMS
+}
+
+if(is.null(dors_diam)){dors_diam<-x$zdiam_raw}#get dorsal and lateral diameters from data.frame, if not given elsewhere
+if(is.null(lat_diam)){lat_diam<-x$ydiam_raw}
+
 segL<-x$slice_length*(x$zdiam_raw/x$zdiam_scaled)
 }else{
 segL<-numeric(length(x_center))
@@ -752,40 +824,106 @@ segL[i]<-x_center[i+1]-x_center[i]
 segL[length(x_center)]<-segL[length(x_center)-1]
 }
 
-masses<-volumes
-if(is.null(densities)){densities<-1}#multiply by segment densities given as vector
-masses<-masses*densities#multiply by segment densities given as vector, or unit density
+if(is.numeric(y)){
+y_center<-y}
+if(!exists("y_center")){
+y_center<-rep(max(lat_diam, na.rm=T)/2, length(x_center))#define vertical COM positions as constant if y values provided
+
+}
+
+masses<-volumes*densities#multiply by segment densities
 
 if(is.null(axis_coord)){
-axis_coord<-gdi::hCOM(x=x_center, volumes=masses)
+if(axis=="yaw" | axis== "y"){axis_coord<-gdi::hCOM(x=x_center, volumes=masses)#for yaw axis
+}else if(axis=="pitch" | axis== "x" | axis=="roll" | axis=="x"){
+axis_coord<-c(gdi::hCOM(x=x_center, volumes=masses), gdi::vCOM(y=y_center, volumes=masses))
+}#for roll or pitch axis
 }
 
 #set scale
 x_center/scale->x_center
+if(is.numeric(y_center)){
+y_center/scale->y_center}
 axis_coord/scale->axis_coord
 dors_diam/scale->dors_diam
-segL<-segL/scale
+lat_diam/scale->lat_diam
+segL/scale->segL
+
+
+    ##for yaw rotation
+if(axis=="yaw" | axis=="y"){
 
 ##approximation assuming sections are point masses
-sum(abs(x_center-axis_coord)^2*masses)->point_I
+    sum((x_center-axis_coord)^2*masses)->point_I
 
-##complete calculation using cylindrical sections
-segment_I<-1/12*masses*segL^2+1/4*masses*(dors_diam/2)^2 # formula from https://en.wikiversity.org/wiki/PlanetPhysics/Rotational_Inertia_of_a_Solid_Cylinder
-#segment_I2<-1/12*masses*segL^2+masses*(dors_diam/2)^2#cuboid formula
-segment_I_corr<-segment_I+abs(x_center-axis_coord)^2*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
+##approximation using cylindrical sections
+segment_I<-1/12*masses*segL^2+1/4*masses*(dors_diam/2)^2 # formula for solid cylinder
+segment_I_corr<-segment_I+(x_center-axis_coord)^2*masses#parallel axis theorem to convert for rotation around chosen axis or COM
 
-sum(segment_I_corr, na.rm=T)->exact_I_cylinder#sum up results
+    sum(segment_I_corr, na.rm=T)->exact_I_cylinder#sum up results
 
-##complete calculation using cuboidal sections
+##approximation using cuboidal sections
 segment_I2<-1/12*masses*(segL^2+dors_diam^2) #equivalent formula from https://en.wikiversity.org/wiki/PlanetPhysics/Rotational_Inertia_of_a_Solid_Cylinder
 #segment_I2<-1/12*masses*segL^2+masses*(dors_diam/2)^2#cuboid formula
-segment_I2_corr<-segment_I2+abs(x_center-axis_coord)^2*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
+segment_I2_corr<-segment_I2+(x_center-axis_coord)^2*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
 
-sum(segment_I2_corr, na.rm=T)->exact_I_cuboid#sum up results
+    sum(segment_I2_corr, na.rm=T)->exact_I_cuboid#sum up results
 
-c(total_mass=sum(masses),I_point_masses=point_I, I_circular_cs=exact_I_cylinder,I_rectangular_cs=exact_I_cuboid)->results
+##approximation using cylindrical sections * correction factor
+segment_I_<-segment_I*corr
+segment_I_corr_<-segment_I_+(x_center-axis_coord)^2*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
+    sum(segment_I_corr_, na.rm=T)->exact_I_cylinder_corrected#sum up results
 
+    c(total_mass=sum(masses),I_point_masses=point_I, I_circular_cs=exact_I_cylinder,I_rectangular_cs=exact_I_cuboid, I_corrected_cs=exact_I_cylinder_corrected)->results_yaw
+
+    
+    
+}else if(axis=="pitch" | axis=="z"){#for pitch rotation XXX
+
+##approximation assuming sections are point masses
+    sum(((x_center-axis_coord[1])^2+(y_center-axis_coord[2])^2)*masses, na.rm=T)->point_I
+
+##approximation using cylindrical sections
+segment_I<-1/12*masses*segL^2+1/4*masses*(lat_diam/2)^2 # formula for solid cylinder
+segment_I_corr<-segment_I+((x_center-axis_coord[1])^2+(y_center-axis_coord[2])^2)*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
+    sum(segment_I_corr, na.rm=T)->exact_I_cylinder#sum up results
+
+##approximation using cuboidal sections
+segment_I2<-1/12*masses*(segL^2+lat_diam^2) #equivalent formula from https://en.wikiversity.org/wiki/PlanetPhysics/Rotational_Inertia_of_a_Solid_Cylinder
+segment_I2_corr<-segment_I2+((x_center-axis_coord[1])^2+(y_center-axis_coord[2])^2)*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
+    sum(segment_I2_corr, na.rm=T)->exact_I_cuboid#sum up results
+
+##approximation using cylindrical sections * correction factor
+segment_I_<-segment_I*corr
+segment_I_corr_<-segment_I+((x_center-axis_coord[1])^2+(y_center-axis_coord[2])^2)*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
+    sum(segment_I_corr_, na.rm=T)->exact_I_cylinder_corrected#sum up results
+
+    c(total_mass=sum(masses),I_point_masses=point_I, I_circular_cs=exact_I_cylinder,I_rectangular_cs=exact_I_cuboid, I_corrected_cs=exact_I_cylinder_corrected)->results_pitch
+}else if(axis=="roll"){
+
+segment_I<-1/4*masses*((lat_diam/2)^2+(dors_diam/2)^2)
+segment_I_<-segment_I*corr
+if(is.numeric(y_center) & length(y_center)==length(x_center)){
+segment_I_corr<-segment_I+(y_center-axis_coord[2])^2*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
+segment_I_corr_<-segment_I_+(y_center-axis_coord[2])^2*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
+
+}else{segment_I_corr<-segment_I
+segment_I_corr_<-segment_I_}
+
+    sum(segment_I_corr, na.rm=T)->exact_I_ellipsoid#sum up results
+    sum(segment_I_corr_, na.rm=T)->exact_I_ellipsoid_corrected#sum up results
+    c(total_mass=sum(masses),I_ellipsoid_cs=exact_I_ellipsoid,I_corrected_cs=exact_I_ellipsoid_corrected)->results_roll
+
+}
+
+
+if(axis=="yaw" | axis=="y"){
 ##return both point mass I and more exact I approximations
-return(results)
+return(results_yaw)}else if(axis=="pitch" | axis=="z"){
+##return both point mass I and more exact I approximations
+return(results_pitch)}else if(axis=="roll" | axis=="x"){
+return(results_roll)
+}
+
 
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/gdi.r
 \name{cscorr}
 \alias{cscorr}
-\title{Measure and analyze cross-sectional geometry}
+\title{Measure and analyze cross-sectional geometry supplied as an image.}
 \usage{
 cscorr(
   image_file,
@@ -15,7 +15,7 @@ cscorr(
 )
 }
 \arguments{
-\item{image_file}{Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.}
+\item{image_file}{Image to be read. Images can be jpeg or png files, or a previously read image saved as an array/matrix-type object in R.}
 
 \item{threshold}{Reference value for colour criterium after which pixels that are part of the cross-section are differentiated from the background.}
 
@@ -23,17 +23,17 @@ cscorr(
 
 \item{method}{Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.}
 
-\item{return}{What value to return. Possible values are "area_corr" (Default, returns ratio between measured area and area of ellipse with same horizontal and vertical diameters), "aspect_ratio" (returns aspect ratio), "diameters" (returns diameters) and "area" (returns area). Any other value for this parameter will prompt the function to return a vector containing all of these.}
+\item{return}{What value to return. Possible values are "area_corr" (Default, returns ratio between measured area and area of ellipse with same horizontal and vertical diameters), "aspect_ratio" (returns aspect ratio), "diameters" (returns diameters), "area" (returns area) and "rotI" (returns correction factors for rotational inertia calculations). Any other value for this parameter will prompt the function to return a vector containing all of these outputs.}
 
 \item{k}{optional superellipse exponent for the (super)ellipse to which the measurements should be compared (for the "area_corr" setting for the parameter return).}
 
 \item{scale}{Optional scale of the image (for raw area measurements).}
 }
 \value{
-Either a numeric of length 1 (depending on the input of the return parameter), defaulting to the area correction factor (if return=="area_corr"), or (if return is left empty or does not match any of the predefined settings) a numeric vector of length 5 containing all the possible outputs (x and y diameters, aspect ratio, area and area correction factor).
+Either a numeric of length 1 (depending on the input of the return parameter), defaulting to the area correction factor (if return=="area_corr"), or (if return is left empty or does not match any of the predefined settings) a numeric vector with 8 elements, containing all the possible outputs (x and y diameters, aspect ratio, area and area correction factor, correction factors representing ratios of rotational inertia in x, y and z planes relative an ellipse of equal diameters).
 }
 \description{
-Measure and analyze cross-sectional geometry
+Measure and analyze cross-sectional geometry supplied as an image.
 }
 \examples{
 fdir <- system.file(package="gdi")

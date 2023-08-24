@@ -1,11 +1,20 @@
-gdi v1.5.1 (Release date: 2023-23-08)
+gdi v1.5.2 (Release date: 2023-08-24)
+==============
+
+Changes:
+* generalized rotI() function to calculate rotational inertia of shapes around any axis
+* added function to cscorr to allow calculation of correction factors for moment of inertia.
+* fixed issue in input to functions (rejection of previously read images supplied as matrix or array)
+
+
+gdi v1.5.1 (Release date: 2023-08-23)
 ==============
 
 Changes:
 * added rotI() function to calculate rotational inertia of shapes
 
 
-gdi v1.5.0 (Release date: 2023-20-19)
+gdi v1.5.0 (Release date: 2023-08-19)
 ==============
 
 Changes:

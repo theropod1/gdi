@@ -27,7 +27,7 @@ csI(
 \item{return}{What to return, defaults to returning second moments of area and polar moment of inertia for the entire shape (if return=="total"), otherwise returns raw data matrix for all pixels.}
 }
 \value{
-Either a data.frame containing Ix, Iy and Iz for the shape (default), or a matrix containing area moments and coordinates for each pixel in the image, as well as area moments converted relative to the common centroid of the shape using parallel axis theorem.
+A numeric vector containing Ix, Iy and Iz for the shape (default), or a matrix containing area moments and coordinates for each pixel in the image, as well as area moments converted relative to the common centroid of the shape using parallel axis theorem.
 }
 \description{
 Calculates the second moment of area (=area moment of inertia, Ix and Iy) and polar moment of inertia (Iz or J) for a cross-section given as an image.

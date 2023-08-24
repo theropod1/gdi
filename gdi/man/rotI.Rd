@@ -2,35 +2,47 @@
 % Please edit documentation in R/gdi.r
 \name{rotI}
 \alias{rotI}
-\title{Calculates the rotational inertia of the body around the y axis. Only works with simple circular/elliptical and rectangular cross-sections, thus pixel-precise estimates are recommended.}
+\title{Calculates the rotational inertia of a body. Only works with simple circular/elliptical and rectangular cross-sections, thus pixel-precise estimates are recommended.}
 \usage{
 rotI(
   x,
+  y = NULL,
   dors_diam = NULL,
+  lat_diam = NULL,
   axis_coord = NULL,
+  axis = "yaw",
   volumes = NULL,
-  densities = NULL,
+  densities = 1,
+  corr = 1,
   scale = 1
 )
 }
 \arguments{
-\item{x}{Either a data frame that is structured like output of gdi(..., return="all") containing masses and diameters for pixe-wide segments, or a numeric vector of horizontal segment COM positions.}
+\item{x}{Either a data frame that is structured like output of gdi(..., return="all") containing masses and diameters for pixel-wide segments, or a numeric vector of segment COM positions.}
 
-\item{dors_diam}{An optional vector of transverse diameters of the silhouette, required if not contained in the data.frame supplied to x.}
+\item{y}{An optional vector of vertical (dorsoventral) segment COM positions.}
 
-\item{axis_coord}{An optional x coordinate of the axis of rotation (parallel to the y axis), defaults to the center of mass of the entire volume if not set.}
+\item{dors_diam}{An optional vector of transverse diameters of the silhouette, required if not contained in x.}
+
+\item{lat_diam}{An optional vector of vertical diameters of the silhouette, required if not contained in x. Needed if inertia for "roll" or "pitch" should be calculated.}
+
+\item{axis_coord}{An optional coordinate of the axis of rotation, defaults to the center of mass of the entire volume if not set.}
+
+\item{axis}{Axis of rotation, defaults to "yaw" (i.e. rotation around vertical axis), can also be "pitch" (rotation around transverse axis) or "roll" (rotation around horizontal axis). For yaw rotation, the body is assumed to be bilaterally symmetrical, whereas for pitch rotation, dorsoventral variation in COM of segments is taken into account.}
 
 \item{volumes}{An optional separate vector of volumes, required if x is not a data.frame containing them.}
 
-\item{densities}{An optional vector of segment densities, with length equal to the length or nrow() of x, to be multiplied with the volumes for the COM calculation. If both subtract and densities are supplied, the density is applied only to the "residual" volume that is left after subtraction.}
+\item{densities}{An optional vector of segment densities, with length equal to the length or nrow() of x, to be multiplied with the volumes to calculate masses used in the inertial calculation.}
+
+\item{corr}{An optional correction factor for the cross-sectional shape, given as the ratio between the characteristic mass moment of inertia of a plane with the given shape (e.g. determined by cscorr()) and an elliptical plane with the same diameters and assigned mass. Allows the calculation of moments of inertia for bodies with arbitrary cross-sectional shapes.}
 
 \item{scale}{Scale value, i.e. number of pixels representing 1 m}
 }
 \value{
-A numeric vector containing four elements: The total mass (on the basis of the gdi results and densities), the rotational inertia of the shape using a point mass approximation of each segment, rotational inertia using a cylindrical approximation for each segment, and rotational inertia using a cuboidal approximation (note that this only changes the mass distribution, while segment masses are still assumed to correspond to gdi results multiplied by optional densities).
+A numeric vector containing: The total mass (on the basis of gdi volumes and optional densities), the rotational inertia of the shape using a point mass approximation of each segment (yaw/pitch rotation only), rotational inertia using a cylindrical approximation for each segment, rotational inertia using a cuboidal approximation (note that this only changes the mass distribution, while segment masses are still assumed to correspond to gdi results multiplied by optional densities), and rotational inertia using a corrected cylindrical approximation based on value for corr.
 }
 \description{
-Calculates the rotational inertia of the body around the y axis. Only works with simple circular/elliptical and rectangular cross-sections, thus pixel-precise estimates are recommended.
+Calculates the rotational inertia of a body. Only works with simple circular/elliptical and rectangular cross-sections, thus pixel-precise estimates are recommended.
 }
 \examples{
 fdir <- system.file(package="gdi")
