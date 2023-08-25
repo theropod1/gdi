@@ -361,18 +361,30 @@ if(is.data.frame(dors)){
         stop("dors is a data.frame, but collumn \"diameter\" not found!")}
     dors_<-dors$diameter
 }
-
+#make data.frame
 sil<-data.frame(ydiam_raw=lat_,zdiam_raw=dors_,ydiam_scaled=lat_/scale,zdiam_scaled=dors_/scale, slice_length=sliceL)#scale-adjust and save in dataframe
 
+if(return!="total"){
+#save segment centroid positions
+##x
+sil$x_center<-sil$slice_length*scale/2
+l<-cumsum(sil$x_center*2)
+if(length(sil$x_center)>1){
+for(i in 2:length(sil$x_center)){
+sil$x_center[i]<-l[i]-sil$x_center[i]
+}}
 
+##y
 if(is.data.frame(lat)){
 sil$y_center<-lat$center
 }
-
+##z
 if(is.data.frame(dors)){
 sil$z_center<-dors$center
 }
+}
 
+#make subset based on indices
 if(!is.null(indices)){
 sil<-sil[indices,]}
 
@@ -408,8 +420,6 @@ return(res)
 }else{
 return(sil)}
 }
-
-
 
 
 
@@ -573,7 +583,7 @@ hCOM<-function(x, volumes=NULL, align="h", subtract=NULL, densities=NULL, scale=
 x_center<-x
 if(is.data.frame(x)){
 volumes<-x$V#look for collumn "V" containing segment volumes
-x_center<-c(1:nrow(x))-0.5#save horizontal COM positions based on segment numbers
+x_center<-x$x_center#c(1:nrow(x))-0.5#save horizontal COM positions based on segment numbers
 }
 masses<-volumes
 if(!is.null(subtract)){masses<-volumes-subtract}#subtract airspace volumes
@@ -807,7 +817,7 @@ x_center<-x
 if(is.data.frame(x)){
 volumes<-x$V#look for collumn "V" containing segment volumes
 
-x_center<-c(1:nrow(x))-0.5#save horizontal COM positions based on segment numbers
+x_center<-x$x_center#c(1:nrow(x))-0.5#save horizontal COM positions based on segment numbers
 if(is.numeric(x$y_center)){
 y_center<-x$y_center#save vertical COM positions (perpendicular to cross-section) based on vertical segment COMS
 }

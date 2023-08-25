@@ -1,3 +1,9 @@
+gdi v1.5.3 (Release date: 2023-08-25)
+==============
+
+Changes:
+* added collumn with x axis centroids to output of gdi(), for use in rotI() and hCOM() functions
+
 gdi v1.5.2 (Release date: 2023-08-24)
 ==============
 
