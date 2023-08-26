@@ -4,7 +4,7 @@
 \alias{plot_sil}
 \title{Plots a silhouette read by measuresil()}
 \usage{
-plot_sil(sil, flip = FALSE, add = FALSE, ...)
+plot_sil(sil, flip = FALSE, add = FALSE, xoffset = 0, yoffset = 0, ...)
 }
 \arguments{
 \item{sil}{A data frame that is the output of measuresil(..., return="all"), containing the center and the diameter of the silhouette at each value for x.}
@@ -12,6 +12,10 @@ plot_sil(sil, flip = FALSE, add = FALSE, ...)
 \item{flip}{Whether to flip axes (useful if measuresil() was performed using align="v", defaults to FALSE.}
 
 \item{add}{Whether to add to an existing plot}
+
+\item{xoffset}{Optional value by which to shift the silhouette on the x axis}
+
+\item{yoffset}{Optional value by which to shift the silhouette on the y axis}
 
 \item{...}{Other parameters to pass on to plot() or lines()}
 }

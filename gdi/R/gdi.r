@@ -654,6 +654,8 @@ return(weighted.mean(y_center, w=masses, na.rm=TRUE)/scale)
 #' @param sil A data frame that is the output of measuresil(..., return="all"), containing the center and the diameter of the silhouette at each value for x.
 #' @param flip Whether to flip axes (useful if measuresil() was performed using align="v", defaults to FALSE.
 #' @param add Whether to add to an existing plot
+#' @param xoffset Optional value by which to shift the silhouette on the x axis
+#' @param yoffset Optional value by which to shift the silhouette on the y axis
 #' @param ... Other parameters to pass on to plot() or lines()
 #' @return A plotted silhouette
 #' @export plot_sil
@@ -664,14 +666,14 @@ return(weighted.mean(y_center, w=masses, na.rm=TRUE)/scale)
 #' measuresil(file.path(fdir,"exdata","lat.png"), return="all")->lat_
 #' plot_sil(lat_)
 
-plot_sil<-function(sil, flip=FALSE, add=FALSE, ...){
+plot_sil<-function(sil, flip=FALSE, add=FALSE, xoffset=0, yoffset=0,...){
 
 if(flip==FALSE){
-x<-c(1:nrow(sil),rev(1:nrow(sil)))
-y<-c(sil$center+sil$diameter/2, rev(sil$center-sil$diameter/2))
+x<-c(1:nrow(sil),rev(1:nrow(sil)))+xoffset
+y<-c(sil$center+sil$diameter/2, rev(sil$center-sil$diameter/2))+yoffset
 }else{
-y<--c(1:nrow(sil),rev(1:nrow(sil)))+nrow(sil)
-x<-c(sil$center+sil$diameter/2, rev(sil$center-sil$diameter/2))
+y<--c(1:nrow(sil),rev(1:nrow(sil)))+nrow(sil)+yoffset
+x<-c(sil$center+sil$diameter/2, rev(sil$center-sil$diameter/2))+xoffset
 }
 
 if(add==TRUE){
