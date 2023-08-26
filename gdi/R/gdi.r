@@ -213,7 +213,7 @@ I_corr<-c(I_x_total,I_y_total,I_z_total)/c(ellipse_x, ellipse_y, ellipse_polar)
   }else if(return=="rotI"){
   names(I_corr)<-c("I_corr_x_pitch","I_corr_y_yaw","I_corr_z_roll")
   return(I_corr)
-  }else{full<-c(x=hdiam, y=vdiam, asp=hdiam/vdiam, area=area, area_corr=area/ecomp, I_corr)
+  }else{full<-c(x=hdiam, y=vdiam, asp=hdiam/vdiam, area=area, area_corr=area/ecomp, I_corr_x_pitch=I_corr[1], I_corr_y_yaw=I_corr[2], I_corr_z_roll=I_corr[1])
   return(full)
     }
 }
