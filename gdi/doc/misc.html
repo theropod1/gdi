@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Miscellaneous Applications</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+
+
+<style type="text/css">
+  code {
+    white-space: pre;
+  }
+  .sourceCode {
+    overflow: visible;
+  }
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Miscellaneous Applications</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="kw">library</span>(gdi)</span></code></pre></div>
+<p>This vignette explores some other applications for the functions provided in the gdi package.</p>
+<p><strong>Estimating airspace proportion (or bone compactness indices)</strong> The image in question is a greyscale png, showing a black bone with a white medullary cavity on a grey background. We hence analyze the colour values in channel 1. The imghist() function will provide a histogram plot and a table with the number of pixels for different colour values</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true"></a>fdir &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="dt">package=</span><span class="st">&quot;gdi&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true"></a><span class="kw">imghist</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;femur.png&quot;</span>), <span class="dt">channel=</span><span class="dv">1</span>, <span class="dt">unique=</span><span class="ot">TRUE</span>)</span></code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<pre><code>#&gt;                   count proportion
+#&gt; 0                 86236  0.3923385
+#&gt; 0.501960784313725 73463  0.3342266
+#&gt; 1                 60101  0.2734349</code></pre>
+<p>The setting unique=TRUE will cause unique colour values to be listed in the output. If unique==FALSE, the output will instead be listed for the bins, as defined by the parameter “breaks”.</p>
+<p>Alternatively, cscorr() can be used for measuring areas of differently coloured pixels:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true"></a><span class="kw">cscorr</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;femur.png&quot;</span>), <span class="dt">channel=</span><span class="dv">1</span>, <span class="dt">method=</span><span class="st">&quot;less&quot;</span>, <span class="dt">threshold=</span><span class="fl">0.2</span>, <span class="dt">return=</span><span class="st">&quot;area&quot;</span>)-&gt;compacta <span class="co">#measure compact bone (black pixels)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true"></a><span class="kw">cscorr</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;femur.png&quot;</span>), <span class="dt">channel=</span><span class="dv">1</span>, <span class="dt">method=</span><span class="st">&quot;greater&quot;</span>, <span class="dt">threshold=</span><span class="fl">0.8</span>, <span class="dt">return=</span><span class="st">&quot;area&quot;</span>)-&gt;medulla <span class="co">#measure medulla (white pixels)</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true"></a>medulla<span class="op">/</span>(compacta<span class="op">+</span>medulla) <span class="co">#calculate the airspace proportion</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true"></a><span class="co">#&gt; [1] 0.4107027</span></span></code></pre></div>
+<p><strong>Estimating second moment of area for cross-sections</strong> For a cross-section provided as an image file (or matrix), the second moment of area and polar moment of inertia can be calculated using the function csI().</p>
+<p>Consider an example of a square cross-section, here given as a 10×10 matrix representing the pixels of an image:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true"></a><span class="kw">matrix</span>(<span class="kw">rep</span>(<span class="dv">1</span>,<span class="dv">100</span>),<span class="dt">nrow=</span><span class="dv">10</span>,<span class="dt">ncol=</span><span class="dv">10</span>)-&gt;m <span class="co">#generate sample matrix representing the pixel colour values of an image</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true"></a><span class="kw">csI</span>(m) <span class="co">#return the second moments of area (Ix and Iy) and the polar moment of inertia (Iz) of the cross-section</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true"></a><span class="co">#&gt;       I_x       I_y       I_z </span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true"></a><span class="co">#&gt;  833.3333  833.3333 1666.6667</span></span></code></pre></div>
+<p>The result here equal the moments of inertia of a square with a side length of 10 unity: 833 = a^4/12 = 10^4/12 = 833</p>
+<p>The csI() function is applicable to cross-sections of any geometry, which are approximated by separately calculating moments of inertia contributions for each pixel of the image and summing up the results. For example, the moments for the bone cross-section analyzed above can be calculated as:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true"></a><span class="kw">csI</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;femur.png&quot;</span>), <span class="dt">channel=</span><span class="dv">1</span>, <span class="dt">method=</span><span class="st">&quot;less&quot;</span>, <span class="dt">threshold=</span><span class="fl">0.2</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true"></a><span class="co">#&gt;        I_x        I_y        I_z </span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true"></a><span class="co">#&gt;  613791415 3393241735 4007033150</span></span></code></pre></div>
+<p>To get results in real-world dimensions, a scale can be provided in the function call. In this case, the bone measures 11.6 cm wide, equating to 676 px in the image, so the appropriate scale to get results in cm⁴ is 676/11.6:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true"></a><span class="kw">csI</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;femur.png&quot;</span>), <span class="dt">channel=</span><span class="dv">1</span>, <span class="dt">method=</span><span class="st">&quot;less&quot;</span>, <span class="dt">threshold=</span><span class="fl">0.2</span>, <span class="dt">scale=</span><span class="dv">676</span><span class="op">/</span><span class="fl">11.6</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true"></a><span class="co">#&gt;       I_x       I_y       I_z </span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true"></a><span class="co">#&gt;  53.21891 294.21172 347.43063</span></span></code></pre></div>
+<p>Precision of the results depends on the resolution of the images in question. In all cases the orientation of I_x and I_y is based on the orientation of the image given as input.</p>
+<p><strong>Estimating moment of (rotational) inertia for volumetric models</strong> For this example, we will again use the sample images provided with the package to perform a volumetric estimation (see other vignettes):</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true"></a>fdir &lt;-<span class="st"> </span><span class="kw">system.file</span>(<span class="dt">package=</span><span class="st">&quot;gdi&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true"></a>measurements_lateral &lt;-<span class="st"> </span><span class="kw">measuresil</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;lat.png&quot;</span>), <span class="dt">return=</span><span class="st">&quot;all&quot;</span>) <span class="co"># using the &quot;return&quot; parameter, we can make measuresil output a data.frame containing the centers on the y axis</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true"></a>measurements_dorsal &lt;-<span class="st"> </span><span class="kw">measuresil</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;dors.png&quot;</span>)) <span class="co">#because our organism is bilaterally symmetric, we are not interested in the location of the COM on the transverse axis, and can therefore disregard recording centers for the dorsal view</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true"></a><span class="kw">gdi</span>(measurements_lateral, measurements_dorsal, <span class="dt">scale=</span><span class="dv">100</span>, <span class="dt">return=</span><span class="st">&quot;all&quot;</span>)-&gt;gdiresults <span class="co"># the parameter setting for &quot;return&quot; makes gdi() return a data.frame with all individual segment volumes, rather than only a single volume for the entire shape</span></span></code></pre></div>
+<p>In order to estimate rotational inertia for this volumetric model, we can now use the rotI() function:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true"></a><span class="kw">rotI</span>(gdiresults, <span class="dt">scale=</span><span class="dv">1000</span>, <span class="dt">axis=</span><span class="st">&quot;yaw&quot;</span>, <span class="dt">densities=</span><span class="dv">1</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true"></a><span class="co">#&gt;       total_mass   I_point_masses    I_circular_cs I_rectangular_cs </span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true"></a><span class="co">#&gt;        40.256774         4.748666         4.851946         4.886372 </span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true"></a><span class="co">#&gt;   I_corrected_cs </span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true"></a><span class="co">#&gt;         4.851946</span></span></code></pre></div>
+<p>Note that since desired results will most likely be in kg*m², the scale for gdi() and rotI() will have to be different (in this case, 1000 px = 1 m, but 100 px = 1 dm). The setting for parameter “axis” defaults to “yaw” (or “y”), but “pitch” (or “z”) and “roll” (or “x”) are also possible settings. The parameter “densities” can be used to supply a unit density for the entire model (defaults to 1), or alternatively a vector of segment densities, if these vary throughout the model (e.g. due to the presence of pneumatic structures in some segments).</p>
+<p>In addition, the parameter “axis_coord” allows the specification of the coordinate of the axis around which rotation is desired. If not specified, the default is for rotation around the center of mass of the shape.</p>
+<p>The output provides three different approximations of the rotational inertia; treating the segments as point masses (definite underestimate), treating the segments as cylindrical, and treating the segments as cuboidal (likely overestimate).</p>
+<p>For cross-sections deviating from these shapes, a correction factor to take into account different mass distributions in a cross-section can be applied. These correction factors can be estimated using cscorr(), if a representation of the cross-section as an image is available:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true"></a><span class="kw">cscorr</span>(<span class="kw">file.path</span>(fdir,<span class="st">&quot;exdata&quot;</span>,<span class="st">&quot;cross_section.png&quot;</span>),<span class="dt">return=</span><span class="st">&quot;rotI&quot;</span>)-&gt;c</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true"></a>c</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true"></a><span class="co">#&gt; I_corr_x_pitch   I_corr_y_yaw  I_corr_z_roll </span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true"></a><span class="co">#&gt;       1.114281       1.091465       1.106729</span></span></code></pre></div>
+<p>The values represent the ratios between the moments of inertia of a shape with the given cross-section, and a hypothetical ellipse with the same horizontal and vertical diameters. Note that it is assumed that mass is constant for this comparison, so accurate segment volumes and densities will still need to be supplied to rotI().</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true"></a><span class="kw">rotI</span>(gdiresults, <span class="dt">scale=</span><span class="dv">1000</span>, <span class="dt">corr=</span>c[<span class="dv">1</span>])</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true"></a><span class="co">#&gt;       total_mass   I_point_masses    I_circular_cs I_rectangular_cs </span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true"></a><span class="co">#&gt;        40.256774         4.748666         4.851946         4.886372 </span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true"></a><span class="co">#&gt;   I_corrected_cs </span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true"></a><span class="co">#&gt;         4.863749</span></span></code></pre></div>
+<p>Using rotI() with the corr-argument will correct for the difference in cross-sectional geometry by multiplying the segment moments of inertia calculated using the cylindrical approximation by the correction factor supplied.</p>
+<p>Note that for most animal body shapes, the effect of cross-sectional geometry on rotational inertia is likely to be minor, as the anteroposterior distance from the center of rotation is the dominant component.</p>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

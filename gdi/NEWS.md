@@ -1,3 +1,10 @@
+gdi v1.5.4 (Release date: 2023-09-06)
+==============
+
+Changes:
+* added new tests and vignette
+
+
 gdi v1.5.3 (Release date: 2023-08-25)
 ==============
 

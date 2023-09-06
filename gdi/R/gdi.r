@@ -143,7 +143,19 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
     area<-area/scale^2#set scale for area
     
 
-##rotational inertia contribution of 1 px², as rectangular plane
+    ## Return the calculated area or ratio
+  if(return=="area"){return(area)
+  }else if(return=="area_corr"){
+  return(area/ecomp)
+  }else if(return=="aspect_ratio"){
+  return(hdiam/vdiam)
+  }else if(return=="diameters"){
+  diam<-c(x=hdiam, y=vdiam)
+  return(diam)
+  }else{
+  
+  
+  ##rotational inertia contribution of 1 px², as rectangular plane
 Ix<-(1^2)*1/12*1/(area*scale^2)#x direction
 Iy<-(1^2)*1/12*1/(area*scale^2)#y direction
 
@@ -194,27 +206,20 @@ I_y_total<-sum(moments[,6],na.rm=T)
 #calculate polar moment
 I_z_total<-sum(I_x_total, I_y_total)
 
-#rotational inertia for ellipse with same diameters
+#rotational inertia for ellipse with same diameters and same mass
 ellipse_y<-1/16*(hdiam*scale)^2
 ellipse_x<-1/16*(vdiam*scale)^2
 ellipse_polar<-ellipse_y+ellipse_x
 
 I_corr<-c(I_x_total,I_y_total,I_z_total)/c(ellipse_x, ellipse_y, ellipse_polar)
 
-    ## Return the calculated area or ratio
-  if(return=="area"){return(area)
-  }else if(return=="area_corr"){
-  return(area/ecomp)
-  }else if(return=="aspect_ratio"){
-  return(hdiam/vdiam)
-  }else if(return=="diameters"){
-  diam<-c(x=hdiam, y=vdiam)
-  return(diam)
-  }else if(return=="rotI"){
+  
+  if(return=="rotI"){
   names(I_corr)<-c("I_corr_x_pitch","I_corr_y_yaw","I_corr_z_roll")
   return(I_corr)
-  }else{full<-c(x=hdiam, y=vdiam, asp=hdiam/vdiam, area=area, area_corr=area/ecomp, I_corr_x_pitch=I_corr[1], I_corr_y_yaw=I_corr[2], I_corr_z_roll=I_corr[1])
-  return(full)
+  }else{
+  full<-c(x=hdiam, y=vdiam, asp=hdiam/vdiam, area=area, area_corr=area/ecomp, I_corr_x_pitch=I_corr[1], I_corr_y_yaw=I_corr[2], I_corr_z_roll=I_corr[1])
+  return(full)}
     }
 }
 
@@ -493,7 +498,7 @@ return(out)
 
 
 ##Function imghist()
-#'Simple histogram analysis for all colour values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general.
+#'Simple histogram analysis for all colour values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general image analysis purposes.
 #'
 #' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.
 #' @param threshold Reference value for colour criterium after which pixels that are part of the silhouette should be differentiated from the background.
@@ -542,7 +547,7 @@ h <- h$counts
 h <- cbind(h,h/total)
 rownames(h) <- names
 colnames(h) <- c("count","proportion")
-return(h)
+return(as.data.frame(h))
 }
 
 if(unique==TRUE){
@@ -552,7 +557,7 @@ names <- names(sorted)
 sorted <- cbind(sorted, sorted/total)
 rownames(sorted)<-names
 colnames(sorted) <- c("count","proportion")
-return(sorted)
+return(as.data.frame(sorted))
 }
 
 }
@@ -698,7 +703,7 @@ plot(y~x, type="l", xlab="x",ylab="y",...)
 #' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
 #' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
 #' @param scale Optional scale of the image (number of pixels per linear unit).
-#' @param return What to return, defaults to returning second moments of area and polar moment of inertia for the entire shape (if return=="total"), otherwise returns raw data matrix for all pixels.
+#' @param return What to return, defaults to returning both x and y second moments of area and polar moment of inertia for the entire shape (if return=="total"), otherwise returns raw data matrix for all pixels.
 #' @return A numeric vector containing Ix, Iy and Iz for the shape (default), or a matrix containing area moments and coordinates for each pixel in the image, as well as area moments converted relative to the common centroid of the shape using parallel axis theorem.
 #' @export csI
 #' @examples
@@ -886,11 +891,11 @@ segment_I_<-segment_I*corr
 segment_I_corr_<-segment_I_+(x_center-axis_coord)^2*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
     sum(segment_I_corr_, na.rm=T)->exact_I_cylinder_corrected#sum up results
 
-    c(total_mass=sum(masses),I_point_masses=point_I, I_circular_cs=exact_I_cylinder,I_rectangular_cs=exact_I_cuboid, I_corrected_cs=exact_I_cylinder_corrected)->results_yaw
+    c(total_mass=sum(masses),I_point_masses=point_I, I_elliptical_cs=exact_I_cylinder,I_rectangular_cs=exact_I_cuboid, I_corrected_cs=exact_I_cylinder_corrected)->results_yaw
 
     
     
-}else if(axis=="pitch" | axis=="z"){#for pitch rotation XXX
+}else if(axis=="pitch" | axis=="z"){#for pitch rotation
 
 ##approximation assuming sections are point masses
     sum(((x_center-axis_coord[1])^2+(y_center-axis_coord[2])^2)*masses, na.rm=T)->point_I
@@ -910,29 +915,38 @@ segment_I_<-segment_I*corr
 segment_I_corr_<-segment_I+((x_center-axis_coord[1])^2+(y_center-axis_coord[2])^2)*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
     sum(segment_I_corr_, na.rm=T)->exact_I_cylinder_corrected#sum up results
 
-    c(total_mass=sum(masses),I_point_masses=point_I, I_circular_cs=exact_I_cylinder,I_rectangular_cs=exact_I_cuboid, I_corrected_cs=exact_I_cylinder_corrected)->results_pitch
-}else if(axis=="roll"){
-
+    c(total_mass=sum(masses),I_point_masses=point_I, I_elliptical_cs=exact_I_cylinder,I_rectangular_cs=exact_I_cuboid, I_corrected_cs=exact_I_cylinder_corrected)->results_pitch
+}else if(axis=="roll" | axis=="x"){
+##approximation using elliptical sections
 segment_I<-1/4*masses*((lat_diam/2)^2+(dors_diam/2)^2)
 segment_I_<-segment_I*corr
+
+##approximation using cuboidal sections
+segment_I2<-1/12*masses*(lat_diam^2+dors_diam^2)
+
+
 if(is.numeric(y_center) & length(y_center)==length(x_center)){
 segment_I_corr<-segment_I+(y_center-axis_coord[2])^2*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
-segment_I_corr_<-segment_I_+(y_center-axis_coord[2])^2*masses#use parallel axis theorem to convert around arbitrary axis or COM of entire shape
+segment_I2_corr<-segment_I2+(y_center-axis_coord[2])^2*masses
+
+segment_I_corr_<-segment_I_+(y_center-axis_coord[2])^2*masses
+
+
 
 }else{segment_I_corr<-segment_I
-segment_I_corr_<-segment_I_}
+segment_I_corr_<-segment_I_
+segment_I2_corr_<-segment_I2}
 
     sum(segment_I_corr, na.rm=T)->exact_I_ellipsoid#sum up results
     sum(segment_I_corr_, na.rm=T)->exact_I_ellipsoid_corrected#sum up results
-    c(total_mass=sum(masses),I_ellipsoid_cs=exact_I_ellipsoid,I_corrected_cs=exact_I_ellipsoid_corrected)->results_roll
+    sum(segment_I2_corr, na.rm=T)->exact_I_cuboid#sum up results
+    c(total_mass=sum(masses),I_elliptical_cs=exact_I_ellipsoid,I_rectangular_cs=exact_I_cuboid,I_corrected_cs=exact_I_ellipsoid_corrected)->results_roll
 
 }
 
-
+##return results
 if(axis=="yaw" | axis=="y"){
-##return both point mass I and more exact I approximations
 return(results_yaw)}else if(axis=="pitch" | axis=="z"){
-##return both point mass I and more exact I approximations
 return(results_pitch)}else if(axis=="roll" | axis=="x"){
 return(results_roll)
 }

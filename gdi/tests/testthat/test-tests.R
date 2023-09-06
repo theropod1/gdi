@@ -81,6 +81,10 @@ expect_equal(as.numeric(signif(csI(file.path(fdir,"exdata","cross_section.png"))
 expect_equal(as.numeric(signif(csI(file.path(fdir,"exdata","cross_section.png"))[3],7)), signif(2446283196,7))
 
 
+matrix(rep(1,100),nrow=10,ncol=10)->m #generate sample matrix representing the pixel colour values of an image
+expect_equal(unname(as.numeric(round(csI(m)[1]))), round(10^4/12))
+expect_equal(unname(as.numeric(round(csI(m)[3]))), round(10^4/12+10^4/12))
+
 })
 
 

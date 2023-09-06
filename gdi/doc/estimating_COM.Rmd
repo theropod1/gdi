@@ -84,7 +84,7 @@ Here we need to keep in mind that the orientation of the different elements is n
 
 Hence, it is recommended to use the built-in plotting function to verify plausibility of results:
 
-```{r, echo=FALSE, fig.cap="Plotted silhouette, including limbs and individual segment COM positions"}
+```{r, fig.cap="Plotted silhouette, including limbs and individual segment COM positions", results=FALSE, message=FALSE}
 plot_sil(measurements_lateral, asp=1)
 plot_sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
 plot_sil(hindlimb_lateral, flip=T, add=T)
@@ -117,7 +117,7 @@ weighted.mean(x_COM,w=volumes*c(1,2,2))#horizontal COM position
 weighted.mean(y_COM,w=volumes*c(1,2,2))#vertical COM position
 ```
 
-```{r, echo=FALSE, fig.cap="Plotted silhouette with overall COM position highlighted"}
+```{r, results=FALSE, message=FALSE, fig.cap="Plotted silhouette with overall COM position highlighted"}
 plot_sil(measurements_lateral, asp=1)
 plot_sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
 plot_sil(hindlimb_lateral, flip=T, add=T)

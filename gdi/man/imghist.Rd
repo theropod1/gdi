@@ -2,7 +2,7 @@
 % Please edit documentation in R/gdi.r
 \name{imghist}
 \alias{imghist}
-\title{Simple histogram analysis for all colour values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general.}
+\title{Simple histogram analysis for all colour values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general image analysis purposes.}
 \usage{
 imghist(
   image_file,
@@ -30,7 +30,7 @@ imghist(
 A plotted histogram (unless plot==FALSE), and a matrix containing the counts from the histogram (default) or the counts for unique colour values (if unique==TRUE).
 }
 \description{
-Simple histogram analysis for all colour values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general.
+Simple histogram analysis for all colour values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general image analysis purposes.
 }
 \examples{
 fdir <- system.file(package="gdi")
