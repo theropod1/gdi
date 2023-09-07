@@ -81,4 +81,40 @@ Duration: 54.3s
 
 ## devtools::check_rhub()
 
-## devtools::check_win_devel()
+─ gdi 1.5.4: NOTE
+
+  Build ID:   gdi_1.5.4.tar.gz-50a62f5a404143e0a585178812e4728c
+  Platform:   Windows Server 2022, R-devel, 64 bit
+  Submitted:  3m 33.7s ago
+  Build time: 3m 30.3s
+
+❯ checking for non-standard things in the check directory ... NOTE
+  Found the following files/directories:
+    ''NULL''
+
+❯ checking for detritus in the temp directory ... NOTE
+  Found the following files/directories:
+    'lastMiKTeXException'
+       
+
+0 errors ✔ | 0 warnings ✔ | 2 notes ✖
+
+
+Build ID: 	gdi_1.5.4.tar.gz-fb8b7e0bcbee48c78e95a8f8dbc3d071
+Platform: 	Fedora Linux, R-devel, clang, gfortran
+Submitted: 	12 minutes 13.8 seconds ago
+Build time: 	12 minutes 11.5 seconds
+NOTES:
+
+* checking HTML version of manual ... NOTE
+Skipping checking HTML validation: no command 'tidy' found
+
+
+Build ID: 	gdi_1.5.4.tar.gz-bdc365a72276473bb9ea66255d6f81d0
+Platform: 	Ubuntu Linux 20.04.1 LTS, R-release, GCC
+Submitted: 	12 minutes 47.7 seconds ago
+Build time: 	12 minutes 45.4 seconds
+NOTES:
+
+* checking HTML version of manual ... NOTE
+Skipping checking HTML validation: no command 'tidy' found

@@ -21,15 +21,15 @@ library(gdi)
 This vignette explores some other applications for the functions provided in the gdi package.
 
 **Estimating airspace proportion (or bone compactness indices)**
-The image in question is a greyscale png, showing a black bone with a white medullary cavity on a grey background. We hence analyze the colour values in channel 1. The imghist() function will provide a histogram plot and a table with the number of pixels for different colour values
+The image in question is a greyscale png, showing a black bone with a white medullary cavity on a grey background. We hence analyze the color values in channel 1. The imghist() function will provide a histogram plot and a table with the number of pixels for different color values
 ```{r}
 fdir <- system.file(package="gdi")
 
 imghist(file.path(fdir,"exdata","femur.png"), channel=1, unique=TRUE)
 ```
-The setting unique=TRUE will cause unique colour values to be listed in the output. If unique==FALSE, the output will instead be listed for the bins, as defined by the parameter "breaks".
+The setting unique=TRUE will cause unique color values to be listed in the output. If unique==FALSE, the output will instead be listed for the bins, as defined by the parameter "breaks".
 
-Alternatively, cscorr() can be used for measuring areas of differently coloured pixels:
+Alternatively, cscorr() can be used for measuring areas of differently colored pixels:
 ```{r}
 cscorr(file.path(fdir,"exdata","femur.png"), channel=1, method="less", threshold=0.2, return="area")->compacta #measure compact bone (black pixels)
 
@@ -44,7 +44,7 @@ For a cross-section provided as an image file (or matrix), the second moment of 
 
 Consider an example of a square cross-section, here given as a 10×10 matrix representing the pixels of an image:
 ```{r}
-matrix(rep(1,100),nrow=10,ncol=10)->m #generate sample matrix representing the pixel colour values of an image
+matrix(rep(1,100),nrow=10,ncol=10)->m #generate sample matrix representing the pixel color values of an image
 csI(m) #return the second moments of area (Ix and Iy) and the polar moment of inertia (Iz) of the cross-section
 ```
 
@@ -84,7 +84,7 @@ Note that since desired results will most likely be in kg*m², the scale for gdi
 
 In addition, the parameter "axis_coord" allows the specification of the coordinate of the axis around which rotation is desired. If not specified, the default is for rotation around the center of mass of the shape.
 
-The output provides three different approximations of the rotational inertia; treating the segments as point masses (definite underestimate), treating the segments as cylindrical, and treating the segments as cuboidal (likely overestimate).
+The output provides three different approximations of the rotational inertia; treating the segments as point masses (definite underestimate), treating the segments as elliptical cylinders, and treating the segments as cuboidal (likely overestimate).
 
 For cross-sections deviating from these shapes, a correction factor to take into account different mass distributions in a cross-section can be applied. These correction factors can be estimated using cscorr(), if a representation of the cross-section as an image is available:
 ```{r}
@@ -96,6 +96,6 @@ The values represent the ratios between the moments of inertia of a shape with t
 ```{r}
 rotI(gdiresults, scale=1000, corr=c[1])
 ```
-Using rotI() with the corr-argument will correct for the difference in cross-sectional geometry by multiplying the segment moments of inertia calculated using the cylindrical approximation by the correction factor supplied.
+Using rotI() with the corr-argument will correct for the difference in cross-sectional geometry by multiplying the segment moments of inertia calculated using the cylindrical approximation by the correction factor supplied. As we can see in the above example, the output under "I_corrected_cs" is now slightly different from the elliptical approximation. Plausible real-world moments of inertia should be expected to always fall somewhere in between the elliptical and the cuboidal approximations.
 
 Note that for most animal body shapes, the effect of cross-sectional geometry on rotational inertia is likely to be minor, as the anteroposterior distance from the center of rotation is the dominant component.

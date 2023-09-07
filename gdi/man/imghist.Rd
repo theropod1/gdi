@@ -2,7 +2,7 @@
 % Please edit documentation in R/gdi.r
 \name{imghist}
 \alias{imghist}
-\title{Simple histogram analysis for all colour values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general image analysis purposes.}
+\title{Simple histogram analysis for all color values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general image analysis purposes.}
 \usage{
 imghist(
   image_file,
@@ -16,21 +16,21 @@ imghist(
 \arguments{
 \item{image_file}{Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.}
 
-\item{threshold}{Reference value for colour criterium after which pixels that are part of the silhouette should be differentiated from the background.}
+\item{threshold}{Reference value for color criterium after which pixels that are part of the silhouette should be differentiated from the background.}
 
-\item{channel}{Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).}
+\item{channel}{color channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the color mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).}
 
-\item{breaks}{A vector of breaks for the histogram, defaults to a bin width of 0.05 between colour values of 0 and 1.}
+\item{breaks}{A vector of breaks for the histogram, defaults to a bin width of 0.05 between color values of 0 and 1.}
 
 \item{plot}{Whether to plot a histogram, defaults to TRUE}
 
-\item{unique}{Whether to return counts for unique colour values, defaults to FALSE.}
+\item{unique}{Whether to return counts for unique color values, defaults to FALSE.}
 }
 \value{
-A plotted histogram (unless plot==FALSE), and a matrix containing the counts from the histogram (default) or the counts for unique colour values (if unique==TRUE).
+A plotted histogram (unless plot==FALSE), and a matrix containing the counts from the histogram (default) or the counts for unique color values (if unique==TRUE).
 }
 \description{
-Simple histogram analysis for all colour values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general image analysis purposes.
+Simple histogram analysis for all color values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general image analysis purposes.
 }
 \examples{
 fdir <- system.file(package="gdi")

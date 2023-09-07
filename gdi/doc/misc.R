@@ -20,7 +20,7 @@ cscorr(file.path(fdir,"exdata","femur.png"), channel=1, method="greater", thresh
 medulla/(compacta+medulla) #calculate the airspace proportion
 
 ## -----------------------------------------------------------------------------
-matrix(rep(1,100),nrow=10,ncol=10)->m #generate sample matrix representing the pixel colour values of an image
+matrix(rep(1,100),nrow=10,ncol=10)->m #generate sample matrix representing the pixel color values of an image
 csI(m) #return the second moments of area (Ix and Iy) and the polar moment of inertia (Iz) of the cross-section
 
 ## -----------------------------------------------------------------------------

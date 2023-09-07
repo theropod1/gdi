@@ -51,8 +51,8 @@ sellipse.coo <- function(k, res=100) {
 #' Measure and analyze cross-sectional geometry supplied as an image.
 #'
 #' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an array/matrix-type object in R.
-#' @param threshold Reference value for colour criterium after which pixels that are part of the cross-section are differentiated from the background.
-#' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
+#' @param threshold Reference value for color criterium after which pixels that are part of the cross-section are differentiated from the background.
+#' @param channel Color channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the color mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
 #' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
 #' @param return What value to return. Possible values are "area_corr" (Default, returns ratio between measured area and area of ellipse with same horizontal and vertical diameters), "aspect_ratio" (returns aspect ratio), "diameters" (returns diameters), "area" (returns area) and "rotI" (returns correction factors for rotational inertia calculations). Any other value for this parameter will prompt the function to return a vector containing all of these outputs.
 #' @param k optional superellipse exponent for the (super)ellipse to which the measurements should be compared (for the "area_corr" setting for the parameter return).
@@ -231,8 +231,8 @@ I_corr<-c(I_x_total,I_y_total,I_z_total)/c(ellipse_x, ellipse_y, ellipse_polar)
 #'Take pixel-by-pixel measurements of a silhouette in jpeg or png format for use with the gdi function.
 #'
 #' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.
-#' @param threshold Reference value for colour criterium after which pixels that are part of the silhouette are differentiated from the background.
-#' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image with transparency, and 3 in an rgb image without transparency, or 4 in a full rgba image).
+#' @param threshold Reference value for color criterium after which pixels that are part of the silhouette are differentiated from the background.
+#' @param channel Color channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the color mode of the image used (e.g. there are two channels to choose from in a greyscale image with transparency, and 3 in an rgb image without transparency, or 4 in a full rgba image).
 #' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
 #' @param align Indicate whether the silhouette long axis is aligned horizontally (setting "h", default), or vertically (any other parameter setting).
 #' @param return Setting for what to return, default setting ("diameters") returns a single vector containing the diameters, any other setting returns a data frame containing centers and diameters.
@@ -429,13 +429,13 @@ return(sil)}
 
 
 ##Function fdetect()
-#'Tool to help determine which threshold value and method to use with measuresil() or cscorr(). The function analyzes all pixels along the edges of the image to determine the background colour, to help with deciding on appropriate settings and avoid errors introduced by inappropriate settings
+#'Tool to help determine which threshold value and method to use with measuresil() or cscorr(). The function analyzes all pixels along the edges of the image to determine the background color, to help with deciding on appropriate settings and avoid errors introduced by inappropriate settings
 #'
 #' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.
-#' @param threshold Reference value for colour criterium after which pixels that are part of the silhouette should be differentiated from the background.
-#' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
-#' @param plot Whether to plot a histogram with the detected colour values (if TRUE) or not (if FALSE, default).
-#' @return A list()-object containing: $edgetable (a table of the different colour values detected and their respective frequencies), $histogram (a histogram-object of the colour values), $most_common (the most common colour value found), $foreground (a character string, indicating whether the foreground colour value is likely "greater" or "less" than the specified threshold), $result (a character string giving a summary of the results)
+#' @param threshold Reference value for color criterium after which pixels that are part of the silhouette should be differentiated from the background.
+#' @param channel Color channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the color mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
+#' @param plot Whether to plot a histogram with the detected color values (if TRUE) or not (if FALSE, default).
+#' @return A list()-object containing: $edgetable (a table of the different color values detected and their respective frequencies), $histogram (a histogram-object of the color values), $most_common (the most common color value found), $foreground (a character string, indicating whether the foreground color value is likely "greater" or "less" than the specified threshold), $result (a character string giving a summary of the results)
 #' @export fdetect
 #' @importFrom graphics hist
 #' @importFrom graphics rug
@@ -481,12 +481,12 @@ out$foreground <- "greater"
 out$foreground <- "less"
 }else{
 out$foreground <- NA
-warning("Automatic background detection failed, please manually ascertain which colour value corresponds to the foreground of your silhouette!")
+warning("Automatic background detection failed, please manually ascertain which color value corresponds to the foreground of your silhouette!")
 }
 
 #show histogram
 if(plot==TRUE){
-hist(edges, breaks=seq(0,1,0.05), xlab=paste("Edge pixel colour values in channel", channel))
+hist(edges, breaks=seq(0,1,0.05), xlab=paste("Edge pixel color values in channel", channel))
 rug(edges)
 }
 out$result <- paste("Best guess is that the foreground has a channel", channel, "value", out$foreground, "than", threshold, "(background appears to be", out$most_common,")")
@@ -498,15 +498,15 @@ return(out)
 
 
 ##Function imghist()
-#'Simple histogram analysis for all colour values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general image analysis purposes.
+#'Simple histogram analysis for all color values in an input image. Can be used to help assess whether a chosen threshold value is appropriate for differentiating the silhouette from the background, or for general image analysis purposes.
 #'
 #' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.
-#' @param threshold Reference value for colour criterium after which pixels that are part of the silhouette should be differentiated from the background.
-#' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
-#' @param breaks A vector of breaks for the histogram, defaults to a bin width of 0.05 between colour values of 0 and 1.
+#' @param threshold Reference value for color criterium after which pixels that are part of the silhouette should be differentiated from the background.
+#' @param channel color channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the color mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
+#' @param breaks A vector of breaks for the histogram, defaults to a bin width of 0.05 between color values of 0 and 1.
 #' @param plot Whether to plot a histogram, defaults to TRUE
-#' @param unique Whether to return counts for unique colour values, defaults to FALSE.
-#' @return A plotted histogram (unless plot==FALSE), and a matrix containing the counts from the histogram (default) or the counts for unique colour values (if unique==TRUE).
+#' @param unique Whether to return counts for unique color values, defaults to FALSE.
+#' @return A plotted histogram (unless plot==FALSE), and a matrix containing the counts from the histogram (default) or the counts for unique color values (if unique==TRUE).
 #' @export imghist
 #' @importFrom graphics abline
 #' @importFrom graphics hist
@@ -534,7 +534,7 @@ img<-img[,,channel]
 }
 
 if(plot==TRUE){#show histogram
-hist(img[,], prob=TRUE, breaks=breaks, xlab=paste("All pixel colour values in channel", channel))
+hist(img[,], prob=TRUE, breaks=breaks, xlab=paste("All pixel color values in channel", channel))
 lines(density(img[,]), col="grey", lwd=2)
 abline(v=threshold)}
 
@@ -699,8 +699,8 @@ plot(y~x, type="l", xlab="x",ylab="y",...)
 #' Calculates the second moment of area (=area moment of inertia, Ix and Iy) and polar moment of inertia (Iz or J) for a cross-section given as an image.
 #'
 #' @param image_file Image to be read. Images can be jpeg or png files, or a previously read image saved as an object in R.
-#' @param threshold Reference value for colour criterium after which pixels that are part of the silhouette should be differentiated from the background.
-#' @param channel Colour channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the colour mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
+#' @param threshold Reference value for color criterium after which pixels that are part of the silhouette should be differentiated from the background.
+#' @param channel color channel to which to apply the threshold criterium. Default is 4 (alpha channel of rgba image). Channel setting needs to be adjusted depending on the color mode of the image used (e.g. there are two channels to choose from in a greyscale image, and 3 in an rgb image).
 #' @param method Method for determining which pixels to count. Default "greater" counts pixels with value greater than threshold (e.g. higher opacity, in the case of an alpha channel). "less" counts pixels with a value less than the threshold. "not" counts all pixels not precisely matching threshold. Any other character string results in only pixels exactly matching the value given as threshold being counted.
 #' @param scale Optional scale of the image (number of pixels per linear unit).
 #' @param return What to return, defaults to returning both x and y second moments of area and polar moment of inertia for the entire shape (if return=="total"), otherwise returns raw data matrix for all pixels.
