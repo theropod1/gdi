@@ -1,3 +1,10 @@
+gdi v1.5.5 (Release date: 2023-09-23)
+==============
+
+Changes:
+* csI() now outputs centroid and bounding box coordinates as attributes
+
+
 gdi v1.5.4 (Release date: 2023-09-06)
 ==============
 

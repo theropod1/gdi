@@ -787,7 +787,18 @@ I_z_total<-sum(I_x_total, I_y_total)
 
 ##return results
 if(return=="total"){
-return(c(I_x=I_x_total, I_y=I_y_total, I_z=I_z_total))
+total<-c(I_x=I_x_total, I_y=I_y_total, I_z=I_z_total)
+
+attr(total, "centroid")<-c(x=xcentroid, y=ycentroid)
+bbox<-rbind(c(min(moments[,3], na.rm=T),max(moments[,3], na.rm=T)),c(min(moments[,4], na.rm=T),max(moments[,4], na.rm=T)))
+rownames(bbox)<-c("x","y")
+colnames(bbox)<-c("min","max")
+attr(total, "bounding_box")<-bbox
+
+
+return(total)
+
+
 }else(return(moments))
 
 }
