@@ -7,7 +7,7 @@ knitr::opts_chunk$set(
 ## ----setup--------------------------------------------------------------------
 library(gdi)
 
-## -----------------------------------------------------------------------------
+## ---- fig.height=5, fig.width=7-----------------------------------------------
 fdir <- system.file(package="gdi")
 
 imghist(file.path(fdir,"exdata","femur.png"), channel=1, unique=TRUE)

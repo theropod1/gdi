@@ -26,7 +26,7 @@ knitr::kable(head(gdiresults))
 hCOM(gdiresults)
 vCOM(gdiresults)
 
-## ---- echo=FALSE, fig.cap="Plotted silhouette, with horizontal and vertical COM position marked."----
+## ---- fig.cap="Plotted silhouette, with horizontal and vertical COM position marked.", fig.height=5, fig.width=7----
 plot_sil(measurements_lateral, asp=1)
 points(hCOM(gdiresults),vCOM(gdiresults))
 abline(v=hCOM(gdiresults), lty=2)
@@ -39,7 +39,7 @@ forelimb_lateral <- measuresil(file.path(fdir,"exdata","fl.png"), align="v", ret
 hl<-gdi(hindlimb_lateral,0.7*hindlimb_lateral,scale=100, return="all")
 fl<-gdi(forelimb_lateral, 0.7*forelimb_lateral, scale=100, return="all")
 
-## ---- fig.cap="Plotted silhouette, including limbs and individual segment COM positions", results=FALSE, message=FALSE----
+## ---- fig.cap="Plotted silhouette, including limbs and individual segment COM positions", results=FALSE, message=FALSE, fig.height=5, fig.width=7----
 plot_sil(measurements_lateral, asp=1)
 plot_sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
 plot_sil(hindlimb_lateral, flip=T, add=T)
@@ -63,7 +63,7 @@ knitr::kable(data.frame(volumes,x_COM,y_COM, row.names=c("axial_total","forelimb
 weighted.mean(x_COM,w=volumes*c(1,2,2))#horizontal COM position
 weighted.mean(y_COM,w=volumes*c(1,2,2))#vertical COM position
 
-## ---- results=FALSE, message=FALSE, fig.cap="Plotted silhouette with overall COM position highlighted"----
+## ---- results=FALSE, message=FALSE, fig.cap="Plotted silhouette with overall COM position highlighted", fig.height=5, fig.width=7----
 plot_sil(measurements_lateral, asp=1)
 plot_sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
 plot_sil(hindlimb_lateral, flip=T, add=T)

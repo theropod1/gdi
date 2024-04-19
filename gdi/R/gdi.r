@@ -657,21 +657,32 @@ return(weighted.mean(y_center, w=masses, na.rm=TRUE)/scale)
 #' Plots a silhouette read by measuresil()
 #'
 #' @param sil A data frame that is the output of measuresil(..., return="all"), containing the center and the diameter of the silhouette at each value for x.
-#' @param flip Whether to flip axes (useful if measuresil() was performed using align="v", defaults to FALSE.
-#' @param add Whether to add to an existing plot
+#' @param flip Logical indicating whether to flip axes (needed if measuresil() was performed using align="v", defaults to FALSE.
+#' @param add Logical indicating whether to add silhoutte to an existing plot (defaults to FALSE)
 #' @param xoffset Optional value by which to shift the silhouette on the x axis
 #' @param yoffset Optional value by which to shift the silhouette on the y axis
+#' @param alpha Opacity value for fill of polygon (defaults to 1)
+#' @param col Fill color of polygon (defaults to "grey")
+#' @param border Border color of polygon (defaults to "darkgrey")
+#' @param scale Scale to use for plotting (given in pixels/unit). Defaults to 1.
+#' @param xlab X axis label to use for plotting (if add=FALSE)
+#' @param ylab Y axis label to use for plotting (if add=FALSE)
 #' @param ... Other parameters to pass on to plot() or lines()
 #' @return A plotted silhouette
 #' @export plot_sil
 #' @importFrom graphics lines
+#' @importFrom graphics axis
+#' @importFrom graphics polygon
+#' @importFrom graphics par
 #' @importFrom graphics plot.default
+#' @importFrom grDevices col2rgb
+#' @importFrom grDevices rgb
 #' @examples
 #' fdir <- system.file(package="gdi")
 #' measuresil(file.path(fdir,"exdata","lat.png"), return="all")->lat_
 #' plot_sil(lat_)
 
-plot_sil<-function(sil, flip=FALSE, add=FALSE, xoffset=0, yoffset=0,...){
+plot_sil<-function(sil, flip=FALSE, add=FALSE, xoffset=0, yoffset=0,alpha=1, col="grey", border="darkgrey", scale=1, xlab="", ylab="",...){
 
 if(flip==FALSE){
 x<-c(1:nrow(sil),rev(1:nrow(sil)))+xoffset
@@ -681,13 +692,26 @@ y<--c(1:nrow(sil),rev(1:nrow(sil)))+nrow(sil)+yoffset
 x<-c(sil$center+sil$diameter/2, rev(sil$center-sil$diameter/2))+xoffset
 }
 
+which(!is.na(y) & !is.na(x))->keep
+x<-x[keep]
+y<-y[keep]
+
+x<-x/scale
+y<-y/scale
+
+aa<-function(col, alpha=0.5){
+  apply(sapply(col, col2rgb)/255,2,function(x){rgb(x[1], x[2], x[3], alpha=alpha)})}
+  
+  if(alpha<1){col<-aa(col,alpha)}
+
 if(add==TRUE){
-lines(y~x, ...)
+polygon(y~x, border=border, col=col,...)
 
 }else{
 
-plot(y~x, type="l", xlab="x",ylab="y",...)
-
+plot(y~x, type="n",axes=FALSE, xlab=xlab, ylab=ylab,...)
+polygon(y~x, col=col, border=border)
+axis(1)
 }
 
 }

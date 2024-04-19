@@ -4,18 +4,43 @@
 \alias{plot_sil}
 \title{Plots a silhouette read by measuresil()}
 \usage{
-plot_sil(sil, flip = FALSE, add = FALSE, xoffset = 0, yoffset = 0, ...)
+plot_sil(
+  sil,
+  flip = FALSE,
+  add = FALSE,
+  xoffset = 0,
+  yoffset = 0,
+  alpha = 1,
+  col = "grey",
+  border = "darkgrey",
+  scale = 1,
+  xlab = "",
+  ylab = "",
+  ...
+)
 }
 \arguments{
 \item{sil}{A data frame that is the output of measuresil(..., return="all"), containing the center and the diameter of the silhouette at each value for x.}
 
-\item{flip}{Whether to flip axes (useful if measuresil() was performed using align="v", defaults to FALSE.}
+\item{flip}{Logical indicating whether to flip axes (needed if measuresil() was performed using align="v", defaults to FALSE.}
 
-\item{add}{Whether to add to an existing plot}
+\item{add}{Logical indicating whether to add silhoutte to an existing plot (defaults to FALSE)}
 
 \item{xoffset}{Optional value by which to shift the silhouette on the x axis}
 
 \item{yoffset}{Optional value by which to shift the silhouette on the y axis}
+
+\item{alpha}{Opacity value for fill of polygon (defaults to 1)}
+
+\item{col}{Fill color of polygon (defaults to "grey")}
+
+\item{border}{Border color of polygon (defaults to "darkgrey")}
+
+\item{scale}{Scale to use for plotting (given in pixels/unit). Defaults to 1.}
+
+\item{xlab}{X axis label to use for plotting (if add=FALSE)}
+
+\item{ylab}{Y axis label to use for plotting (if add=FALSE)}
 
 \item{...}{Other parameters to pass on to plot() or lines()}
 }

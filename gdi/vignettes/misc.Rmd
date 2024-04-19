@@ -22,7 +22,7 @@ This vignette explores some other applications for the functions provided in the
 
 **Estimating airspace proportion (or bone compactness indices)**
 The image in question is a greyscale png, showing a black bone with a white medullary cavity on a grey background. We hence analyze the color values in channel 1. The imghist() function will provide a histogram plot and a table with the number of pixels for different color values
-```{r}
+```{r, fig.height=5, fig.width=7}
 fdir <- system.file(package="gdi")
 
 imghist(file.path(fdir,"exdata","femur.png"), channel=1, unique=TRUE)

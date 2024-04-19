@@ -1,3 +1,10 @@
+gdi v1.6.0 (Release date: 2023-09-23)
+==============
+
+Changes:
+* cosmetic improvements to plot_sil function, which now plots polygons instead of lines and allows to specify a scale
+* Increased size of plots in vignettes for better visibility
+
 gdi v1.5.5 (Release date: 2023-09-23)
 ==============
 

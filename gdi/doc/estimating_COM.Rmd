@@ -59,7 +59,7 @@ So the coordinates, in pixels, of the estimated center of mass of the shape are 
 
 We can visualize the results using the function plot_sil():
 
-```{r, echo=FALSE, fig.cap="Plotted silhouette, with horizontal and vertical COM position marked."}
+```{r, fig.cap="Plotted silhouette, with horizontal and vertical COM position marked.", fig.height=5, fig.width=7}
 plot_sil(measurements_lateral, asp=1)
 points(hCOM(gdiresults),vCOM(gdiresults))
 abline(v=hCOM(gdiresults), lty=2)
@@ -84,7 +84,7 @@ Here we need to keep in mind that the orientation of the different elements is n
 
 Hence, it is recommended to use the built-in plotting function to verify plausibility of results:
 
-```{r, fig.cap="Plotted silhouette, including limbs and individual segment COM positions", results=FALSE, message=FALSE}
+```{r, fig.cap="Plotted silhouette, including limbs and individual segment COM positions", results=FALSE, message=FALSE, fig.height=5, fig.width=7}
 plot_sil(measurements_lateral, asp=1)
 plot_sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
 plot_sil(hindlimb_lateral, flip=T, add=T)
@@ -117,7 +117,7 @@ weighted.mean(x_COM,w=volumes*c(1,2,2))#horizontal COM position
 weighted.mean(y_COM,w=volumes*c(1,2,2))#vertical COM position
 ```
 
-```{r, results=FALSE, message=FALSE, fig.cap="Plotted silhouette with overall COM position highlighted"}
+```{r, results=FALSE, message=FALSE, fig.cap="Plotted silhouette with overall COM position highlighted", fig.height=5, fig.width=7}
 plot_sil(measurements_lateral, asp=1)
 plot_sil(forelimb_lateral, flip=T, add=T)#for silhouettes that were aligned, but digitized with align="v", we need to specify flip=TRUE here
 plot_sil(hindlimb_lateral, flip=T, add=T)
