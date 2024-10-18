@@ -371,12 +371,12 @@ sil<-data.frame(ydiam_raw=lat_,zdiam_raw=dors_,ydiam_scaled=lat_/scale,zdiam_sca
 sliceL/scale->sliceL
 
 if(return!="total"){
-#save segment centroid positions
+#save raw segment centroid positions on the x (anteroposterior) axis
 ##x
-sil$x_center<-sil$slice_length*scale/2
-l<-cumsum(sil$x_center*2)
+sil$x_center<-sil$sliceL_raw/2#half the raw sliceL
+l<-cumsum(sil$x_center*2)#cumulative length of all slices
 if(length(sil$x_center)>1){
-for(i in 2:length(sil$x_center)){
+for(i in 2:length(sil$x_center)){#for each segment, subtract half the segment length from the cumulative segment length to get the segment center
 sil$x_center[i]<-l[i]-sil$x_center[i]
 }}
 
