@@ -1,3 +1,9 @@
+gdi v1.7.0 (Release date: 2024-10-18)
+==============
+Changes:
+* fixed handling of segment length input in gdi(): scale factor is now also applied to manual segment lengths internally, rather than requiring the segment lengths to already be given to the correct scale.
+
+
 gdi v1.6.0 (Release date: 2023-09-23)
 ==============
 

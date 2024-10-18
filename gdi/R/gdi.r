@@ -29,7 +29,7 @@ sellipse <- function(a, b, k) {
 #'
 #' @param k superellipse exponent.
 #' @param res the desired resolution
-#' @return a data frame containing 
+#' @return a data frame containing x and y coordinates for the outline of the (super)ellipse
 #' @export sellipse.coo
 #' @examples
 #' sellipse.coo(2.0)->df #get coordinates for normal ellipse (exponent k=2)
@@ -332,12 +332,12 @@ return(depthscenters)
 #' @param dors Measurements of diameter in dorsal view/second of two orthogonal views to be used with the gdi. Can be either a numeric vector, a data.frame (output of measuresil(...,return="all") with a collumn named "diameter", or a text file with diameter measurements to be scanned. Must be the same length as lat.
 #' @param indices Optional indices specifying a subset of the silhouette measurement vectors to be analyzed. Useful if separate segment calculations are desired.
 #' @param scale Scale of the data, given in terms of how many units of the input data (e.g. pixels) are in one side of the desired unit of output volume. Defaults to 10.
-#' @param sliceL Length of individual segments to be used in the GDI. Defaults to 1/scale.
+#' @param sliceL Length of individual segments to be used in the GDI. Defaults to 1.
 #' @param method Method to be used for the GDI. Default "raw" setting calculates each segment as an elliptical cylinder with volume = Area * SliceL. Any other string will result in volume being calculated as an elliptical frustum with base areas based on the measurements of segments i and i+1.
 #' @param k Superellipse exponent to be used for the cross-sectional area. Defaults to 2.0 (normal ellipse).
 #' @param corr Correction factor for area of cross-sections, calculated as the ratio between the actual cross-sectional area and that of a (super)ellipse (depending on the specified exponent k) with the same diameters. This setting enables the function to account for complex, non-elliptical cross-sections. Default value is 1, i.e. no correction. Can be either a single number, or a numeric vector of the same length as lat and dors (in the case of a changing cross-sectional geometry along the length of the body).
 #' @param smooth.ends If method != "raw", specify whether first and last segments should be left raw, or taper to 0 (i.e. be approximated as cones). Only applies if there are no leading or following zeros in the measurement vectors.
-#' @param return Determines whether to report the estimated total volume (if default/"total"), or a data.frame() with segment radii, areas and volumes (if left empty of any other character string.
+#' @param return Determines whether to report the estimated total volume (if default/"total"), or a data.frame() with segment radii, areas and volumes (if left empty of any other character string).
 #' @return Either a single number representing the total volume estimated (with names indicating the horizontal length of the silhouette in the unit determined by scale), or (if return!="total") a data.frame() containing columns with the radii in both dimensions, the estimated elliptical or superelliptical areas, and the segment volumes.
 #' @export gdi
 #' @examples
@@ -347,7 +347,7 @@ return(depthscenters)
 #' gdi(lat=lateral, dors=lateral/2, scale=10, method="smooth", k=2.3)
 
 
-gdi<-function(lat, dors, indices=NULL, scale=10, sliceL=1/scale, method="raw", k=2.0, corr=1, smooth.ends=FALSE, return="total"){
+gdi<-function(lat, dors, indices=NULL, scale=10, sliceL=1, method="raw", k=2.0, corr=1, smooth.ends=FALSE, return="total"){
 lat_<-lat
 dors_<-dors
 
@@ -367,7 +367,8 @@ if(is.data.frame(dors)){
     dors_<-dors$diameter
 }
 #make data.frame
-sil<-data.frame(ydiam_raw=lat_,zdiam_raw=dors_,ydiam_scaled=lat_/scale,zdiam_scaled=dors_/scale, slice_length=sliceL)#scale-adjust and save in dataframe
+sil<-data.frame(ydiam_raw=lat_,zdiam_raw=dors_,ydiam_scaled=lat_/scale,zdiam_scaled=dors_/scale, slice_length=sliceL/scale, sliceL_raw=sliceL)#scale-adjust and save in dataframe
+sliceL/scale->sliceL
 
 if(return!="total"){
 #save segment centroid positions
@@ -418,7 +419,7 @@ attr(sil, "z_resolution")<-attr(dors, "y_resolution")
 
 
 sum(sil$V)->res#sum up segments
-names(res) <- paste("x_dim",sum(sil$ydiam_raw!=0)/scale, "units", sep="_")
+names(res) <- paste("x_dim",sum(sil$slice_length[sil$ydiam_raw!=0]), "units", sep="_")
 
 if(return=="total"){
 return(res)
@@ -837,7 +838,7 @@ return(total)
 #' @param y An optional vector of vertical (dorsoventral) segment COM positions.
 #' @param dors_diam An optional vector of transverse diameters of the silhouette, required if not contained in x.
 #' @param lat_diam An optional vector of vertical diameters of the silhouette, required if not contained in x. Needed if inertia for "roll" or "pitch" should be calculated.
-#' @param axis_coord An optional coordinate of the axis of rotation, defaults to the center of mass of the entire volume if not set.
+#' @param axis_coord An optional coordinate of the axis of rotation (in original units, i.e. pixels), defaults to the center of mass of the entire volume if not set.
 #' @param axis Axis of rotation, defaults to "yaw" (i.e. rotation around vertical axis), can also be "pitch" (rotation around transverse axis) or "roll" (rotation around horizontal axis). For yaw rotation, the body is assumed to be bilaterally symmetrical, whereas for pitch rotation, dorsoventral variation in COM of segments is taken into account.
 #' @param volumes An optional separate vector of volumes, required if x is not a data.frame containing them.
 #' @param corr An optional correction factor for the cross-sectional shape, given as the ratio between the characteristic mass moment of inertia of a plane with the given shape (e.g. determined by cscorr()) and an elliptical plane with the same diameters and assigned mass. Allows the calculation of moments of inertia for bodies with arbitrary cross-sectional shapes.

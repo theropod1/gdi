@@ -26,7 +26,7 @@ rotI(
 
 \item{lat_diam}{An optional vector of vertical diameters of the silhouette, required if not contained in x. Needed if inertia for "roll" or "pitch" should be calculated.}
 
-\item{axis_coord}{An optional coordinate of the axis of rotation, defaults to the center of mass of the entire volume if not set.}
+\item{axis_coord}{An optional coordinate of the axis of rotation (in original units, i.e. pixels), defaults to the center of mass of the entire volume if not set.}
 
 \item{axis}{Axis of rotation, defaults to "yaw" (i.e. rotation around vertical axis), can also be "pitch" (rotation around transverse axis) or "roll" (rotation around horizontal axis). For yaw rotation, the body is assumed to be bilaterally symmetrical, whereas for pitch rotation, dorsoventral variation in COM of segments is taken into account.}
 

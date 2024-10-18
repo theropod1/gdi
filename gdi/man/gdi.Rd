@@ -9,7 +9,7 @@ gdi(
   dors,
   indices = NULL,
   scale = 10,
-  sliceL = 1/scale,
+  sliceL = 1,
   method = "raw",
   k = 2,
   corr = 1,
@@ -26,7 +26,7 @@ gdi(
 
 \item{scale}{Scale of the data, given in terms of how many units of the input data (e.g. pixels) are in one side of the desired unit of output volume. Defaults to 10.}
 
-\item{sliceL}{Length of individual segments to be used in the GDI. Defaults to 1/scale.}
+\item{sliceL}{Length of individual segments to be used in the GDI. Defaults to 1.}
 
 \item{method}{Method to be used for the GDI. Default "raw" setting calculates each segment as an elliptical cylinder with volume = Area * SliceL. Any other string will result in volume being calculated as an elliptical frustum with base areas based on the measurements of segments i and i+1.}
 
@@ -36,7 +36,7 @@ gdi(
 
 \item{smooth.ends}{If method != "raw", specify whether first and last segments should be left raw, or taper to 0 (i.e. be approximated as cones). Only applies if there are no leading or following zeros in the measurement vectors.}
 
-\item{return}{Determines whether to report the estimated total volume (if default/"total"), or a data.frame() with segment radii, areas and volumes (if left empty of any other character string.}
+\item{return}{Determines whether to report the estimated total volume (if default/"total"), or a data.frame() with segment radii, areas and volumes (if left empty of any other character string).}
 }
 \value{
 Either a single number representing the total volume estimated (with names indicating the horizontal length of the silhouette in the unit determined by scale), or (if return!="total") a data.frame() containing columns with the radii in both dimensions, the estimated elliptical or superelliptical areas, and the segment volumes.

@@ -12,7 +12,7 @@ sellipse.coo(k, res = 100)
 \item{res}{the desired resolution}
 }
 \value{
-a data frame containing
+a data frame containing x and y coordinates for the outline of the (super)ellipse
 }
 \description{
 calculate coordinates for plotting a superellipse for visualizing body cross-sections
