@@ -1,3 +1,10 @@
+gdi 1.8.0 (Release date: 2025-05-19)
+==============
+Changes:
+* Added function expandConvexHull, to generate soft tissue expansion factors based on regressions and data in Macaulay et al. 2023
+* Added expansion parameter to plot_sil, to allow the visualization of soft tissue expansion factors.
+
+
 gdi v1.7.0 (Release date: 2024-10-18)
 ==============
 Changes:

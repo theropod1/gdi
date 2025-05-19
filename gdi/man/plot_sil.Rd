@@ -8,6 +8,7 @@ plot_sil(
   sil,
   flip = FALSE,
   add = FALSE,
+  expansion = 1,
   xoffset = 0,
   yoffset = 0,
   alpha = 1,
@@ -25,6 +26,8 @@ plot_sil(
 \item{flip}{Logical indicating whether to flip axes (needed if measuresil() was performed using align="v", defaults to FALSE.}
 
 \item{add}{Logical indicating whether to add silhoutte to an existing plot (defaults to FALSE)}
+
+\item{expansion}{Numeric containing expansion factor to multiply with body diameters. Defaults to 1 (i.e. no expansion). XXX}
 
 \item{xoffset}{Optional value by which to shift the silhouette on the x axis}
 

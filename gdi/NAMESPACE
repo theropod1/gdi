@@ -2,6 +2,7 @@
 
 export(csI)
 export(cscorr)
+export(expandConvexHull)
 export(fdetect)
 export(gdi)
 export(hCOM)
