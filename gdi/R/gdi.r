@@ -671,7 +671,7 @@ expandConvexHull<-function(volume=NULL,method="isometry",taxon="Croc_Lizard",seg
 if(method%in%c("isometry","iso","Isometry","Iso") | is.null(volume)){
 ##isometric expansions
 iso<-data.frame(Croc_Lizard=c(1.266, 8.646, 1.219, 3.369, 2.852, 2.866, 3.564, 5.102, 2.655, 3.494, 2.553),Bird=c(1.008, 3.825, 1.436, 1, 1.97, 1.736, 1.303, 4.538, 1.729, 0.792, 1.716))
-iso$all<-(iso$Croc_Lizard+iso$Bird)/2
+iso$all<-c(1.137,6.235,1.328,3.369,2.411,2.301,2.434,4.820,2.192,2.143,2.135)
 rownames(iso)<-c('Head', 'Neck', 'Trunk', 'Tail', 'Humerus', 'Forearm', 'Hand', 'Thigh', 'Shank', 'MT', 'Pes')
 
 F_expansion<-iso[segment,taxon]
