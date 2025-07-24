@@ -685,7 +685,7 @@ if(taxon%in%c("bird","Bird","Aves","avian","Avian")) ols_expansions<-data.frame(
 if(taxon%in%c("all","All")) ols_expansions<-data.frame(intercept=c(-0.085, 0.008, 0.213, 0.001, 0.017, 0.124, 0.487, 0.322, -0.402, 0.21),slope=c(0.982, 0.892, 1.018,1, 0.95, 0.963, 1.012, 0.975, 1.021, 0.946, 1.002))
 rownames(ols_expansions)<-c('Head', 'Neck', 'Trunk', 'Tail', 'Humerus', 'Forearm', 'Hand', 'Thigh', 'Shank', 'MT', 'Pes')
 
-expansion_function<-function(x){ols_expansions[segment,"slope"]*volume+ols_expansions[segment,"intercept"]}
+expansion_function<-function(x){exp(ols_expansions[segment,"slope"]*log(volume)+ols_expansions[segment,"intercept"])}
 
 F_expansion<-expansion_function(volume)/volume
 }
@@ -698,7 +698,7 @@ if(taxon%in%c("all","All")) pgls_expansions<-data.frame(intercept=c(-0.054, -0.0
 
 rownames(pgls_expansions)<-c('Head', 'Neck', 'Trunk', 'Tail', 'Humerus', 'Forearm', 'Hand', 'Thigh', 'Shank', 'MT', 'Pes')
 
-expansion_function<-function(x){pgls_expansions[segment,"slope"]*volume+pgls_expansions[segment,"intercept"]}
+expansion_function<-function(x){exp(pgls_expansions[segment,"slope"]*log(volume)+pgls_expansions[segment,"intercept"])}
 
 F_expansion<-expansion_function(volume)/volume
 }
