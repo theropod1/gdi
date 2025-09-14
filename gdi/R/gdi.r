@@ -1118,9 +1118,10 @@ x0_rel<-x0/length(lat0)
 #
 
 if(!is.null(lat)){ ##lateral given, dorsal unknown
+df<-FALSE
 if(is.data.frame(lat)){
+df<-TRUE
 lat$diameter->lat
-if(exists("dcenter")) mean(dcenter,na.rm=TRUE)->center
 }
 if(is.null(indices)) indices<-c(1:length(lat))
 lat[indices]->lat
@@ -1131,6 +1132,11 @@ x_rel<-x/length(lat)
 
 interpolated_ratios<-rmeana(x0=x0_rel, y0=ratios0, x1=x_rel, plusminus=smooth/2,...)
 interpolated_ratios*lat->interpolated_diameters
+if(df && exists("dcenter")){
+mean(dcenter,na.rm=TRUE)->center
+rep(center,length(interpolated_diameters))->center
+}
+
 
 }else if(!is.null(dors)){ ##dorsal given, lateral unknown
 df<-FALSE
@@ -1158,8 +1164,10 @@ interpolated_ratios<-1/interpolated_ratios
 interpolated_diameters[is.na(interpolated_diameters)]<-0
 #interpolated_ratios[is.na(interpolated_ratios)]<-0
 
-if(exists("center") && is.numeric(center)) interpolated_diameters<-data.frame(diameter=interpolated_diameters,center=center)
-
+if(exists("center") && is.numeric(center)){
+interpolated_diameters<-data.frame(diameter=interpolated_diameters,center=center)
+interpolated_diameters$center[which(interpolated_diameters$diameter==0)]<-NA
+}
 if(return%in%c("Diameters","diameters","diam","D")) return(interpolated_diameters)
 if(return%in%c("ratios","Ratios","rat","R")) return(interpolated_ratios)
 
