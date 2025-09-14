@@ -656,7 +656,7 @@ return(weighted.mean(y_center, w=masses, na.rm=TRUE)/scale)
 ##Function expandConvexHull()
 #' Estimate soft tissue expansion factors following Macaulay et al. 2023
 #'
-#' @param volume Numeric value containing volume of the convex hull. Defaults to NULL, in which case an isometric expansion factor is always returned.
+#' @param volume Numeric value containing volume of the convex hull (in liters). Defaults to NULL, in which case an isometric expansion factor is always returned. Setting for this parameter is ignored if method=="isometry"
 #' @param method Method to use for deriving soft tissue expansion factor. Possible optios are "isometry" (default), "OLS" or "PGLS".
 #' @param taxon Taxon whose specific regressions or expansion factors to use, can be "Croc_Lizard" for the expansions based on Crocodilians and Squamates, "Bird" for expansions based on birds of "All" for the pooled (allometric) or averaged (isometric) expansions.
 #' @param segment Body segment for which expansion factor should be calculated. Possible options are: "Head", "Neck", "Trunk", "Tail", "Humerus", "Forearm", "Hand", "Thigh", "Shank", "MT" or "Pes"
@@ -1047,4 +1047,121 @@ return(results_roll)
 }
 
 
+}##
+
+
+
+
+
+##function transfer_ratio()
+#' Transfer
+#' @param lat diameters in lateral view, supply to estimate transverse diameters from dorsoventral ones
+#' @param dors diameters in dorsal (or ventral) view, supply to estimate dorsoventral diameters from transverse ones
+#' @param indices optional vector of indices to apply to subset lat or dors
+#' @param lat0 (dorsoventral) diameters in lateral view for template
+#' @param dors0 (transverse) diameters in dorsal/ventral view for template (vector is subsetted to same length as lat0 if lengths don’t match)
+#' @param indices0 optional vector of indices to subset lat0 and dors0
+#' @param smooth width of smoothing interval (as fraction of full silhouette length)
+#' @param return what to return, either "diameters" to return diameters, or "ratios", to return ratios
+#' @param ... additional arguments to pass on to paleoDiv::rmeana() for computation of running mean of diameter ratios
+#' @return Either a numeric vector of interpolated transverse or dorsoventral diameters or width/depth or depth/width ratios depending on the chosen settings, or a data.frame of same format as dors0 or lat0 (with the "center" column copied)
+#' @export transfer_ratio
+#' @examples
+#' fdir <- system.file(package="gdi")
+#' lat <- measuresil(file.path(fdir,"exdata","lat.png"), return="all")
+#' dors <- measuresil(file.path(fdir,"exdata","dors.png"), return="all")
+#' gdi(lat,dors,scale=100) #real volume
+#' dors_est <- transfer_ratio(lat=lat,lat0=lat,dors0=dors,smooth=0.005)
+#' gdi(lat,dors_est,scale=100) #volume with dorsal view interpolated
+#' lat_est <- transfer_ratio(dors=dors,lat0=lat,dors0=dors,smooth=0.005)
+#' gdi(lat_est,dors,scale=100) #volume with lateral view interpolated
+#' plot_sil(lat,asp=1) #visualize results
+#' plot_sil(dors,add=TRUE)
+#' plot_sil(lat_est,add=TRUE,col="blue",alpha=0.3)
+#' plot_sil(dors_est,add=TRUE,col="blue",alpha=0.3)
+
+transfer_ratio<-function(lat=NULL,dors=NULL,indices=NULL,lat0,dors0,indices0=NULL,smooth=0.005,return="diameters",...){
+
+#define advanced running mean function
+rmeana<-function(x0, y0, x1 = NULL, plusminus = 0.005,...){
+    if (is.null(x1)) {x_ <- x0}else{x_ <- x1}
+    y_ <- rep(NA, length(x_))
+    
+    for (i in 1:length(x_)) {
+        indices <- which(abs(as.numeric(x0 - x_[i])) <= plusminus)
+		y_[i] <- mean(y0[indices], na.rm = TRUE)
+    }
+    return(y_)}#end simplified rmeana function definition, see also the package "paleoDiv"
+
+#prepare template: equalize lengths
+if(is.data.frame(lat0)){
+if("center"%in%colnames(lat0)) lat0$center->lcenter
+lat0$diameter->lat0
 }
+if(is.data.frame(dors0)){
+if("center"%in%colnames(dors0)) dors0$center->dcenter
+dors0$diameter->dors0
+}
+dors0[1:length(lat0)]->dors0
+
+#subset template
+if(is.null(indices0)) c(1:length(lat0))->indices0
+lat0[indices0]->lat0
+dors0[indices0]->dors0
+if(exists("dcenter") && is.numeric(dcenter)) dcenter[indices0]->dcenter
+if(exists("lcenter") && is.numeric(lcenter)) lcenter[indices0]->lcenter
+
+#compute ratios
+dors0/lat0->ratios0
+c(1:length(lat0))->x0
+x0_rel<-x0/length(lat0)
+#
+
+if(!is.null(lat)){ ##lateral given, dorsal unknown
+if(is.data.frame(lat)){
+lat$diameter->lat
+if(exists("dcenter")) mean(dcenter,na.rm=TRUE)->center
+}
+if(is.null(indices)) indices<-c(1:length(lat))
+lat[indices]->lat
+
+#
+c(1:length(lat))->x
+x_rel<-x/length(lat)
+
+interpolated_ratios<-rmeana(x0=x0_rel, y0=ratios0, x1=x_rel, plusminus=smooth/2,...)
+interpolated_ratios*lat->interpolated_diameters
+
+}else if(!is.null(dors)){ ##dorsal given, lateral unknown
+df<-FALSE
+if(is.data.frame(dors)){
+df<-TRUE
+dors$diameter->dors
+}
+if(is.null(indices)) indices<-c(1:length(dors))
+dors[indices]->dors
+
+#
+c(1:length(dors))->x
+x_rel<-x/length(dors)
+
+interpolated_ratios<-rmeana(x0=x0_rel, y0=ratios0, x1=x_rel, plusminus=smooth/2,...)
+
+if( df && exists("lcenter") && is.numeric(lcenter) ){
+rmeana(x0=x0_rel, y0=lcenter, x1=x_rel, plusminus=smooth/2,...)->center #interpolate lateral view center
+}
+
+dors/interpolated_ratios->interpolated_diameters
+interpolated_ratios<-1/interpolated_ratios
+}else{stop("lat or dors need to be supplied")}
+
+interpolated_diameters[is.na(interpolated_diameters)]<-0
+#interpolated_ratios[is.na(interpolated_ratios)]<-0
+
+if(exists("center") && is.numeric(center)) interpolated_diameters<-data.frame(diameter=interpolated_diameters,center=center)
+
+if(return%in%c("Diameters","diameters","diam","D")) return(interpolated_diameters)
+if(return%in%c("ratios","Ratios","rat","R")) return(interpolated_ratios)
+
+}##
+

@@ -1,6 +1,6 @@
 Package: gdi
 Title: Volumetric Analysis using Graphic Double Integration
-Version: 1.8.1
+Version: 1.9.0
 Date: 2025-05-19
 Authors@R: 
     person("Darius", "Nau", , "dariusnau@gmx.at", role = c("aut", "cre"),

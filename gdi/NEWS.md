@@ -1,3 +1,7 @@
+gdi v1.9.0 (Release date: 2025-09-15)
+==============
+* added transfer_ratio() function for interpolating missing dorsal or lateral view silhouettes from a template (=specimen with known dorsal and lateral view silhouette from which
+
 gdi v1.8.1 (Release date: 2025-07-25)
 ==============
 * fixed expandConvexHull() function; regressions are log-transformed

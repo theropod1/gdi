@@ -12,7 +12,7 @@ expandConvexHull(
 )
 }
 \arguments{
-\item{volume}{Numeric value containing volume of the convex hull. Defaults to NULL, in which case an isometric expansion factor is always returned.}
+\item{volume}{Numeric value containing volume of the convex hull (in liters). Defaults to NULL, in which case an isometric expansion factor is always returned. Setting for this parameter is ignored if method=="isometry"}
 
 \item{method}{Method to use for deriving soft tissue expansion factor. Possible optios are "isometry" (default), "OLS" or "PGLS".}
 
