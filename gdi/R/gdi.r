@@ -145,9 +145,9 @@ ecomp <- sellipse(vdiam/2, hdiam/2, k)
 
     ## Return the calculated area or ratio
   if(return=="area"){return(area)
-  }else if(return=="area_corr"){
+  }else if(return%in%c("area_corr","corr")){
   return(area/ecomp)
-  }else if(return=="aspect_ratio"){
+  }else if(return%in%c("asp","aspect_ratio")){
   return(hdiam/vdiam)
   }else if(return=="diameters"){
   diam<-c(x=hdiam, y=vdiam)
@@ -222,9 +222,6 @@ I_corr<-c(I_x_total,I_y_total,I_z_total)/c(ellipse_x, ellipse_y, ellipse_polar)
   return(full)}
     }
 }
-
-
-
 
 
 ##Function measuresil()
@@ -323,6 +320,88 @@ return(depthscenters)
 }
 
 }
+
+
+
+## function inter_corr()
+#' Helper function for interpolating cross-sectional metrics over the length of a silhouette
+#' @param ... cross-sections between which to interpolate. Each object can be either a single numeric each giving the quantity to be interpolated between, a full output of cscorr() with option return="all", or a character vector giving filenames to use with cscorr().
+#' @param x indices along silhouette to use as points of interpolation. If NULL, the function will treat indices as indices of the silhouette itself, not x, and attempt to prepend 1 and append sil (or its length) to it, to make the cross-section interpolate toward the default value at the first and last slice.
+#' @param sil dataframe or vector (output of measuresil()) or single numeric giving the total number of slices of the silhouette for which to interpolate cross-sections
+#' @param indices subset of x to which the elements in ... pertain, if ... does not have the same total number of elements as x
+#' @param default default value to fill for elements of x not in indices, if length(x)>length(...)
+#' @param default_k default superellipse exponent to use for elements of x not in indices, supersedes setting for default if not NULL and return parameter is set to "area_corr"
+#' @param return which element of the cscorr() output to return in interpolated form (defaults to area_corr, can also be "asp"
+#' @param v verbosity setting (logical)
+#' @details This is a convenience function and wrapper around approx() and cscorr(), which creates a linear interpolation of cross-section geometry over the entire length of a silhouette. Input can in principle be any numeric value (but, is intended to primarily be cross-sectional geometry defined by "area_corr" and "asp" elements returned via cscorr().
+#' @importFrom stats approx
+#' @export inter_corr
+#' @examples
+#' fdir <- system.file(package="gdi")
+#' cf <- cscorr(file.path(fdir,"exdata","cross_section.png"))
+#' lat <- measuresil(file.path(fdir,"exdata","lat.png"))
+#' inter_corr(cf,x=c(1,1000,2341), sil=lat, indices=2)
+
+inter_corr<-function(...,x=NULL,sil,indices=NULL,default=1, default_k=2, return="area_corr",v=FALSE){
+list(...)->dots
+if(is.data.frame(sil)) sil<-nrow(sil)
+if(is.numeric(sil) && length(sil)>1) sil<-length(sil)
+if(is.null(x) && !is.null(indices)) c(1,indices,sil)->x
+if(v) print(sil)
+if(v) print(dots)
+
+if(length(x)!=length(dots) && is.null(indices)) stop("x is not same length as supplied cross-sections and no i was provided to subset it")
+#extract corrs
+corrs<-numeric()
+
+corr_temp<-list()
+for(i in 1:length(dots)){
+
+if(is.numeric(dots[[i]]) && length(dots[[i]])==1){
+as.numeric(dots[[i]])[1]->corrs[i]
+
+}else if(is.character(dots[[i]])){
+if(dots[[i]]%in%names(corr_temp)){
+corr_temp[[dots[[i]]]]->c0
+}else{
+cscorr(dots[[i]],return=return)->c0
+c0->corr_temp[[dots[[i]]]]
+}
+c0->corrs[i]
+
+}else if(is.numeric(dots[[i]]) && length(dots)>1){
+dots[[i]]->c0
+c0[return]->corrs[i]
+}
+
+}
+if(v) print(corrs)
+##interpolate corr factors
+if(length(x)!=length(corrs) && !is.null(indices) && length(indices)==length(corrs)){
+if(is.null(default_k) | return!="area_corr"){default->corr_default
+}else{sellipse(1,1,default_k)/sellipse(1,1,2)->corr_default}
+
+
+if(v) print(corr_default)
+y_in<-rep(corr_default,length(x))
+y_in[indices]<-corrs
+
+approx(x=x, y=y_in, xout=c(1:sil))$y->out
+
+}else{
+corrs->y_in
+approx(x=x, y=y_in, xout=c(1:sil))$y->out
+}
+
+#set information attributes
+attr(out,"x")<-x
+attr(out,"y_in")<-y_in
+
+attr(out,"return")<-return
+
+#output
+return(out)
+}##
 
 
 ##Function gdi()
@@ -1054,7 +1133,7 @@ return(results_roll)
 
 
 ##function transfer_ratio()
-#' Transfer
+#' Transfer a vector of aspect ratios onto another body profile
 #' @param lat diameters in lateral view, supply to estimate transverse diameters from dorsoventral ones
 #' @param dors diameters in dorsal (or ventral) view, supply to estimate dorsoventral diameters from transverse ones
 #' @param indices optional vector of indices to apply to subset lat or dors
@@ -1080,6 +1159,7 @@ return(results_roll)
 #' plot_sil(lat_est,add=TRUE,col="blue",alpha=0.3)
 #' plot_sil(dors_est,add=TRUE,col="blue",alpha=0.3)
 
+
 transfer_ratio<-function(lat=NULL,dors=NULL,indices=NULL,lat0,dors0,indices0=NULL,smooth=0.005,return="diameters",...){
 
 #define advanced running mean function
@@ -1089,10 +1169,12 @@ rmeana<-function(x0, y0, x1 = NULL, plusminus = 0.005,...){
     
     for (i in 1:length(x_)) {
         indices <- which(abs(as.numeric(x0 - x_[i])) <= plusminus)
+        if (length(indices) == 0) indices <- which.min(abs(x0 - x_[i]))
 		y_[i] <- mean(y0[indices], na.rm = TRUE)
     }
-    return(y_)}#end simplified rmeana function definition, see also the package "paleoDiv"
-
+    
+    return(y_)} #end simplified rmeana function definition, see also package "paleoDiv"
+    
 #prepare template: equalize lengths
 if(is.data.frame(lat0)){
 if("center"%in%colnames(lat0)) lat0$center->lcenter
@@ -1117,6 +1199,7 @@ c(1:length(lat0))->x0
 x0_rel<-x0/length(lat0)
 #
 
+##do interpolation
 if(!is.null(lat)){ ##lateral given, dorsal unknown
 df<-FALSE
 if(is.data.frame(lat)){
@@ -1130,7 +1213,30 @@ lat[indices]->lat
 c(1:length(lat))->x
 x_rel<-x/length(lat)
 
-interpolated_ratios<-rmeana(x0=x0_rel, y0=ratios0, x1=x_rel, plusminus=smooth/2,...)
+interpolated_ratios<-rmeana(x0=c(0,x0_rel), y0=c(ratios0[1],ratios0), x1=x_rel, plusminus=smooth/2,...)
+
+
+if(any(is.na(interpolated_ratios))){ #remove nas resulting from interpolation, replace with closest non-na value
+which(is.na(interpolated_ratios))->narat
+which(!is.na(interpolated_ratios))->nnarat
+
+for(i in narat){which(abs(nnarat-i)==min(abs(nnarat-i)))->j
+interpolated_ratios[i]<-mean(interpolated_ratios[nnarat[j]],na.rm=TRUE)
+}
+
+}
+
+if(any(is.infinite(interpolated_ratios))){ #remove infs resulting from interpolation, replace with closest non-inf value
+which(is.infinite(interpolated_ratios))->narat
+which(!is.infinite(interpolated_ratios))->nnarat
+
+for(i in narat){which(abs(nnarat-i)==min(abs(nnarat-i)))->j
+interpolated_ratios[i]<-mean(interpolated_ratios[nnarat[j]],na.rm=TRUE)
+}
+
+}
+
+
 interpolated_ratios*lat->interpolated_diameters
 if(df && exists("dcenter")){
 mean(dcenter,na.rm=TRUE)->center
@@ -1151,7 +1257,27 @@ dors[indices]->dors
 c(1:length(dors))->x
 x_rel<-x/length(dors)
 
-interpolated_ratios<-rmeana(x0=x0_rel, y0=ratios0, x1=x_rel, plusminus=smooth/2,...)
+interpolated_ratios<-rmeana(x0=c(0,x0_rel), y0=c(ratios0[1],ratios0), x1=x_rel, plusminus=smooth/2,...)
+
+if(any(is.na(interpolated_ratios))){ #remove nas resulting from interpolation, replace with closest non-na value
+which(is.na(interpolated_ratios))->narat
+which(!is.na(interpolated_ratios))->nnarat
+
+for(i in narat){which(abs(nnarat-i)==min(abs(nnarat-i)))->j
+interpolated_ratios[i]<-mean(interpolated_ratios[nnarat[j]],na.rm=TRUE)
+}
+
+}
+
+if(any(is.infinite(interpolated_ratios))){ #remove infs resulting from interpolation, replace with closest non-inf value
+which(is.infinite(interpolated_ratios))->narat
+which(!is.infinite(interpolated_ratios))->nnarat
+
+for(i in narat){which(abs(nnarat-i)==min(abs(nnarat-i)))->j
+interpolated_ratios[i]<-mean(interpolated_ratios[nnarat[j]],na.rm=TRUE)
+}
+
+}
 
 if( df && exists("lcenter") && is.numeric(lcenter) ){
 rmeana(x0=x0_rel, y0=lcenter, x1=x_rel, plusminus=smooth/2,...)->center #interpolate lateral view center
@@ -1162,6 +1288,10 @@ interpolated_ratios<-1/interpolated_ratios
 }else{stop("lat or dors need to be supplied")}
 
 interpolated_diameters[is.na(interpolated_diameters)]<-0
+if(any(is.infinite(interpolated_diameters))) interpolated_diameters[is.infinite(interpolated_diameters)]<-0
+
+if(any(is.infinite(interpolated_ratios))) interpolated_ratios[is.infinite(interpolated_ratios)]<-NA
+
 #interpolated_ratios[is.na(interpolated_ratios)]<-0
 
 if(exists("center") && is.numeric(center)){
@@ -1172,4 +1302,7 @@ if(return%in%c("Diameters","diameters","diam","D")) return(interpolated_diameter
 if(return%in%c("ratios","Ratios","rat","R")) return(interpolated_ratios)
 
 }##
+
+
+
 

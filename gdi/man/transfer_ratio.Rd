@@ -2,7 +2,7 @@
 % Please edit documentation in R/gdi.r
 \name{transfer_ratio}
 \alias{transfer_ratio}
-\title{Transfer}
+\title{Transfer a vector of aspect ratios onto another body profile}
 \usage{
 transfer_ratio(
   lat = NULL,
@@ -39,7 +39,7 @@ transfer_ratio(
 Either a numeric vector of interpolated transverse or dorsoventral diameters or width/depth or depth/width ratios depending on the chosen settings, or a data.frame of same format as dors0 or lat0 (with the "center" column copied)
 }
 \description{
-Transfer
+Transfer a vector of aspect ratios onto another body profile
 }
 \examples{
 fdir <- system.file(package="gdi")

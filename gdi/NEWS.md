@@ -1,3 +1,10 @@
+ gdi 1.10.0 (Release date: 2025-11-19)
+==============
+* added inter_corr(): convenience function to interpolate cross-sections along a silhouette 
+
+gdi 1.9.1  (Release date: 2025-10-23)
+* fixed behavior of transfer_ratio with some values resulting in inf
+
 gdi v1.9.0 (Release date: 2025-09-15)
 ==============
 * added transfer_ratio() function for interpolating missing dorsal or lateral view silhouettes from a template (=specimen with known dorsal and lateral view silhouette from which
