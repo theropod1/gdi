@@ -1,12 +1,11 @@
-version 1.5.4:
+version 1.10.0
 
 ## devtools::check_win_devel():
-Status: 1 NOTE:
+Returned 1 NOTE:
 * checking CRAN incoming feasibility ... NOTE
 Maintainer: 'Darius Nau <dariusnau@gmx.at>'
 
-Possibly misspelled words in DESCRIPTION:
-  Iy (10:994)
-  Iz (10:998)
-  
-These are intentional (standard abbreviations referring to the second moment of area) and not misspelled.
+The Date field is over a month old...
+Status: 1 NOTE
+
+(description has been updated since to fix old date)
